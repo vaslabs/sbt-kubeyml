@@ -8,7 +8,12 @@ case class Deployment(
   apiVersion: String = "apps/v1",
   metadata: DeploymentMetadata,
   spec: Spec
-) extends KubernetesState
+) extends KubernetesState {
+  private[kubeyml] def addContainerPorts(ports: List[Port]): Deployment =
+    this.copy(spec = spec.addContainerPorts(ports))
+  private[kubeyml] def annotateSpecTemplate(annotations: Map[String, String]): Deployment =
+    this.copy(spec = spec.annotate(annotations))
+}
 
 case class DeploymentMetadata(
   name: String,
@@ -23,7 +28,12 @@ case class Spec(
   selector: Selector,
   template: Template,
   strategy: DeploymentStrategy
-)
+) {
+  private[deployment] def addContainerPorts(ports: List[Port]): Spec =
+    this.copy(template = template.addContainerPorts(ports))
+  private[deployment] def annotate(annotations: Map[String, String]): Spec =
+    this.copy(template = template.annotate(annotations))
+}
 
 case class Selector(
   matchLabels: MatchLabels
@@ -31,10 +41,23 @@ case class Selector(
 
 case class MatchLabels(app: Option[String])
 
-case class Template(metadata: TemplateMetadata, spec: TemplateSpec)
+case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
+  private[deployment] def addContainerPorts(ports: List[Port]): Template =
+    this.copy(spec = spec.addContainerPorts(ports))
+
+  private[deployment] def annotate(annotations: Map[String, String]): Template =
+    this.copy(metadata = metadata.copy(annotations = annotations))
+}
+
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
 
-case class TemplateSpec(containers: List[Container])
+case class TemplateSpec(containers: List[Container]) {
+  private[deployment] def addContainerPorts(ports: List[Port]): TemplateSpec =
+    this.copy(containers = containers.map {
+      container => container.copy(ports = container.ports ++ ports)
+    }
+  )
+}
 
 case class Container(
     name: String,

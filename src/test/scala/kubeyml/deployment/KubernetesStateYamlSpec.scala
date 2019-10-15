@@ -36,35 +36,22 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
   }
 
   "kubernetes sample" must "be generated from definition" in {
+    import api._
     val expectedServiceName = Gen.alphaStr.sample.get
     val expectedNamespace = Gen.alphaStr.sample.get
     val expectedMetadataKey = Gen.alphaStr.sample.get
     val expectedMetadataValue = Gen.alphaNumStr.sample.get
     val expectedDockerImage = Gen.alphaNumStr.sample.get
-    val deployment = Deployment(
-      metadata = DeploymentMetadata(expectedServiceName, expectedNamespace),
-      spec = Spec(
-                replicas = 1,
-                selector = Selector(MatchLabels(Some(expectedServiceName))),
-                strategy = RollingUpdate(),
-                template = Template(
-                  metadata = TemplateMetadata(
-                    Labels(expectedServiceName),
-                    Map(expectedMetadataKey -> expectedMetadataValue)),
-                  spec = TemplateSpec(
-                    List(
-                      Container(
-                        image = expectedDockerImage,
-                        imagePullPolicy = Always,
-                        name = expectedServiceName,
-                        ports = List(Port(Some("app"), 8080)),
-                        livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), 3 seconds, 5 seconds, None),
-                        readinessProbe = NoProbe)
-                      )
-                    )
-                  )
+    val deployment = deploy.namespace(expectedNamespace)
+      .service(expectedServiceName)
+      .withImage(expectedDockerImage)
+      .withProbes(
+        livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), 3 seconds, 5 seconds, None),
+        readinessProbe = NoProbe
       )
-    )
+      .replicas(1)
+      .addPorts(List(Port(Some("app"), 8080)))
+      .annotateSpecTemplate(Map(expectedMetadataKey -> expectedMetadataValue))
 
     val expectedYaml = parse(
       s"""

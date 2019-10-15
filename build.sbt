@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
   "org.scalacheck" %% "scalacheck" % "1.14.1" % "test"
 )
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.4.1")
 
 lazy val pluginSettings = Seq(
   sbtPlugin := true,

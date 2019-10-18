@@ -1,8 +1,9 @@
 package kubeyml.deployment.sbt
-import kubeyml.deployment.{HttpGet, HttpProbe, Port, Probe}
+import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, Port, Probe, Resource, Resources}
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerAlias
+
 import scala.concurrent.duration._
 
 trait Keys {
@@ -16,6 +17,11 @@ trait Keys {
   val ports = settingKey[List[Port]]("A set of port numbers and names to be exposed to a kube service")
   val replicas = settingKey[Int]("The number of replicas of the application")
   val annotations = settingKey[Map[String, String]]("Wildcard for setting annotations on the deployment spec")
+
+  val resourceLimits = settingKey[Resource]("Cpu and memory limit for the container")
+  val resourceRequests = settingKey[Resource]("Cpu and memory request, must not exceed limits")
+
+  val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
 
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
 
@@ -38,7 +44,10 @@ object Keys extends Keys {
           (readinessProbe in kube).value
         ).addContainerPorts((ports in kube).value)
           .annotateSpecTemplate((annotations in kube).value)
-          .replicas((replicas in kube).value),
+          .replicas((replicas in kube).value)
+          .addEnv((envs in kube).value)
+          .requestResource((resourceRequests in kube).value)
+          .limit((resourceLimits in kube).value),
         (target in ThisBuild).value
       )
     },
@@ -50,6 +59,9 @@ object Keys extends Keys {
     ),
     readinessProbe in kube := (livenessProbe in kube).value,
     annotations in kube := Map.empty,
-    replicas in kube := 2
+    replicas in kube := 2,
+    envs in kube := Map.empty,
+    resourceRequests in kube := Resources().requests,
+    resourceLimits := Resources().limits
   )
 }

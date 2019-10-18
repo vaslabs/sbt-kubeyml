@@ -45,6 +45,9 @@ object json_support {
     }
   }
 
+  implicit val cpuEncoder: Encoder[Cpu] = Encoder.encodeString.contramap(_.value.toString + 'm')
+  implicit val memoryEncoder: Encoder[Memory] = Encoder.encodeString.contramap(_.value.toString + "Mi")
+
   implicit val probeEncoder: Encoder[Probe] = Encoder.instance {
     case h: HttpProbe => httpProbeEncoder(h)
     case NoProbe => Json.Null

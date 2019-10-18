@@ -60,5 +60,7 @@ package object api {
       deployment.addEnv(Map(EnvName(variableName) -> EnvFieldValue(fieldPath)))
     def env(variableName: String, variableValue: String): Deployment =
       deployment.addEnv(Map(EnvName(variableName) -> EnvRawValue(variableValue)))
+    def requestResource(cores: Int, memoryInMiB: Int): Deployment =
+      deployment.request(Resource(Cpu(cores), Memory(memoryInMiB)))
   }
 }

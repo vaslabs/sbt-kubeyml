@@ -93,6 +93,13 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
         |              port: 8080
         |            initialDelaySeconds: 3
         |            periodSeconds : 5
+        |          resources:
+        |            requests:
+        |              memory: "256Mi"
+        |              cpu: "500m"
+        |            limits:
+        |              memory: "512Mi"
+        |              cpu: "1000m"
         |          env:
         |            - name: ${expectedEnvVarName}
         |              value: ${expectedEnvVarValue}
@@ -133,8 +140,21 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
       EnvName(expectedSecretEnvName) -> EnvSecretValue(expectedSecretName, expectedSecretKey),
       EnvName(expectedRawName) -> EnvRawValue(expectedRawValue)
     ).asJson shouldBe envYaml
+  }
 
-
+  "cpu and memory" must "be encoded as strings with m and MiB indicators" in {
+    Cpu(500).asJson shouldBe "500m".asJson
+    Memory(128).asJson shouldBe "128Mi".asJson
+    Resources(Resource(Cpu(500), Memory(128)), Resource(Cpu(1000), Memory(512))).asJson shouldBe parse(
+      """
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        """
+    ).right.get
   }
 
 }

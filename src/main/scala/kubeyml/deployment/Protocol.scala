@@ -15,6 +15,12 @@ case class Deployment(
     this.copy(spec = spec.annotate(annotations))
   private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
     this.copy(spec = spec.addContainerEnvs(envs))
+
+  private[kubeyml] def request(resource: Resource): Deployment =
+    this.copy(spec = spec.limitResource(resource))
+
+  private[kubeyml] def limit(resource: Resource): Deployment =
+    this.copy(spec = spec.limitResource(resource))
 }
 
 case class DeploymentMetadata(
@@ -37,6 +43,12 @@ case class Spec(
     this.copy(template = template.annotate(annotations))
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
     this.copy(template = template.addContainerEnvs(envs))
+
+  private[deployment] def requestResource(resource: Resource): Spec =
+    this.copy(template = template.requestResource(resource))
+
+  private[deployment] def limitResource(resource: Resource): Spec =
+    this.copy(template = template.limitResource(resource))
 }
 
 case class Selector(
@@ -54,6 +66,12 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
     this.copy(spec = spec.addContainerEnvs(envs))
+
+  private[deployment] def requestResource(resource: Resource): Template =
+    this.copy(spec = spec.requestResource(resource))
+
+  private[deployment] def limitResource(resource: Resource): Template =
+    this.copy(spec = spec.limitResource(resource))
 }
 
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
@@ -66,6 +84,11 @@ case class TemplateSpec(containers: List[Container]) {
   )
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
     this.copy(containers = containers.map(_.addEnvs(envs)))
+  private[deployment] def requestResource(resource: Resource): TemplateSpec =
+    this.copy(containers = containers.map(_.requestResource(resource)))
+
+  private[deployment] def limitResource(resource: Resource): TemplateSpec =
+    this.copy(containers = containers.map(_.limitResource(resource)))
 }
 
 case class Container(
@@ -75,10 +98,33 @@ case class Container(
     imagePullPolicy: ImagePullPolicy,
     livenessProbe: Probe,
     readinessProbe: Probe,
-    env: Map[EnvName, EnvValue]
+    env: Map[EnvName, EnvValue],
+    resources: Resources = Resources()
 ) {
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
+
+  private[deployment] def requestResource(resource: Resource): Container =
+    this.copy(resources = resources.copy(requests = resource))
+  private[deployment] def limitResource(resource: Resource): Container =
+    this.copy(resources = resources.copy(limits = resource))
+}
+
+case class Resources(
+      requests: Resource = Resource(Cpu(500), Memory(256)),
+      limits: Resource = Resource(Cpu(1000), Memory(512))
+) {
+  require(requests.cpu.value <= limits.cpu.value)
+  require(requests.memory.value <= limits.memory.value)
+}
+
+case class Resource(cpu: Cpu, memory: Memory)
+
+case class Cpu(value: Int) {
+  require(value > 0)
+}
+case class Memory(value: Int) {
+  require(value > 0)
 }
 
 case class EnvName(value: String)

@@ -56,4 +56,43 @@ object json_support {
     _.+:("kind" -> "Deployment".asJson)
   )
 
+  private def keyValue(value: EnvValue): String = value match {
+    case EnvRawValue(_) =>
+      "value"
+    case EnvFieldValue(_) =>
+      "valueFrom"
+    case EnvSecretValue(_, _) =>
+      "valueFrom"
+  }
+
+  private val envFieldValueEncoder: Encoder[EnvFieldValue] = Encoder.instance { fieldValue =>
+    Json.obj(
+      "fieldRef" -> Json.obj("fieldPath" -> fieldValue.fieldPath.asJson)
+    )
+  }
+  private val envSecretValueEncoder: Encoder[EnvSecretValue] = Encoder.instance { secretValue =>
+    Json.obj(
+      "secretKeyRef" -> secretValue.asJson
+    )
+  }
+  private val envRawValueEncoder: Encoder[EnvRawValue] = Encoder.encodeString.contramap(_.value)
+
+  implicit val envValueEncoder: Encoder[EnvValue] = Encoder.instance {
+    case raw: EnvRawValue => envRawValueEncoder(raw)
+    case secret: EnvSecretValue => envSecretValueEncoder(secret)
+    case fieldPath: EnvFieldValue => envFieldValueEncoder(fieldPath)
+  }
+
+  implicit val envVarDefinitionEncoder: Encoder[EnvVarDefinition] = Encoder.instance { envVarDefinition =>
+    Json.obj(
+      "name" -> envVarDefinition.name.asJson,
+             keyValue(envVarDefinition.value) -> envVarDefinition.value.asJson
+    )
+  }
+
+  implicit val environmentVariablesEncoder: Encoder[Map[EnvName, EnvValue]] = Encoder.encodeList[EnvVarDefinition]
+    .contramap(_.toList.map {
+      case (name, value) => EnvVarDefinition(name.value, value)
+    })
+
 }

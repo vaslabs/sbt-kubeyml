@@ -95,4 +95,40 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
     deployment.asJson shouldBe expectedYaml
   }
 
+  "environment variables" must "decode to list of key values" in {
+    val expectedFieldPathName = Gen.alphaUpperStr.sample.get
+    val expectedFieldPathValue = Gen.alphaLowerStr.sample.get
+
+    val expectedSecretEnvName = Gen.alphaUpperStr.sample.get
+    val expectedSecretKey = Gen.alphaLowerStr.sample.get
+    val expectedSecretName = Gen.alphaLowerStr.sample.get
+
+    val expectedRawName = Gen.alphaUpperStr.sample.get
+    val expectedRawValue = Gen.alphaNumStr.sample.get
+
+    val envYaml = parse(
+      s"""
+          - name: ${expectedFieldPathName}
+            valueFrom:
+              fieldRef:
+                fieldPath: ${expectedFieldPathValue}
+          - name: ${expectedSecretEnvName}
+            valueFrom:
+              secretKeyRef:
+                key: ${expectedSecretKey}
+                name: ${expectedSecretName}
+          - name: ${expectedRawName}
+            value: ${expectedRawValue}
+      """
+    ).right.get
+
+    Map[EnvName, EnvValue](
+      EnvName(expectedFieldPathName) -> EnvFieldValue(expectedFieldPathValue),
+      EnvName(expectedSecretEnvName) -> EnvSecretValue(expectedSecretName, expectedSecretKey),
+      EnvName(expectedRawName) -> EnvRawValue(expectedRawValue)
+    ).asJson shouldBe envYaml
+
+
+  }
+
 }

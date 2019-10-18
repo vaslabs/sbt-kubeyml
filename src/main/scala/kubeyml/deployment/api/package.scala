@@ -38,7 +38,8 @@ package object api {
                   List.empty,
                   Always,
                   livenessProbe,
-                  readinessProbe
+                  readinessProbe,
+                  Map.empty
                 )
               )
             )

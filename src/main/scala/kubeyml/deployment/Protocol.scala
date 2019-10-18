@@ -65,8 +65,17 @@ case class Container(
     ports: List[Port],
     imagePullPolicy: ImagePullPolicy,
     livenessProbe: Probe,
-    readinessProbe: Probe
+    readinessProbe: Probe,
+    env: Map[EnvName, EnvValue]
 )
+
+case class EnvName(value: String)
+sealed trait EnvValue
+case class EnvRawValue(value: String) extends EnvValue
+case class EnvFieldValue(fieldPath: String) extends EnvValue
+case class EnvSecretValue(name: String, key: String) extends EnvValue
+
+case class EnvVarDefinition(name: String, value: EnvValue)
 
 // For more probes go https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 sealed trait Probe

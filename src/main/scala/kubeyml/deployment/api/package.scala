@@ -54,5 +54,11 @@ package object api {
     def replicas(number: Int): Deployment =
       deployment.copy(spec = deployment.spec.copy(replicas = number))
     def annotateTemplate(annotations: Map[String, String]) = deployment.annotateSpecTemplate(annotations)
+    def envFromSecret(variableName: String, name: String, key: String): Deployment =
+      deployment.addEnv(Map(EnvName(variableName) -> EnvSecretValue(name, key)))
+    def envFromPath(variableName: String, fieldPath: String): Deployment =
+      deployment.addEnv(Map(EnvName(variableName) -> EnvFieldValue(fieldPath)))
+    def env(variableName: String, variableValue: String): Deployment =
+      deployment.addEnv(Map(EnvName(variableName) -> EnvRawValue(variableValue)))
   }
 }

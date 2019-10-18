@@ -13,6 +13,8 @@ case class Deployment(
     this.copy(spec = spec.addContainerPorts(ports))
   private[kubeyml] def annotateSpecTemplate(annotations: Map[String, String]): Deployment =
     this.copy(spec = spec.annotate(annotations))
+  private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
+    this.copy(spec = spec.addContainerEnvs(envs))
 }
 
 case class DeploymentMetadata(
@@ -33,6 +35,8 @@ case class Spec(
     this.copy(template = template.addContainerPorts(ports))
   private[deployment] def annotate(annotations: Map[String, String]): Spec =
     this.copy(template = template.annotate(annotations))
+  private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
+    this.copy(template = template.addContainerEnvs(envs))
 }
 
 case class Selector(
@@ -47,6 +51,9 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
   private[deployment] def annotate(annotations: Map[String, String]): Template =
     this.copy(metadata = metadata.copy(annotations = annotations))
+
+  private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
+    this.copy(spec = spec.addContainerEnvs(envs))
 }
 
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
@@ -57,6 +64,8 @@ case class TemplateSpec(containers: List[Container]) {
       container => container.copy(ports = container.ports ++ ports)
     }
   )
+  private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
+    this.copy(containers = containers.map(_.addEnvs(envs)))
 }
 
 case class Container(
@@ -67,7 +76,10 @@ case class Container(
     livenessProbe: Probe,
     readinessProbe: Probe,
     env: Map[EnvName, EnvValue]
-)
+) {
+  private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
+    this.copy(env = env ++ envs)
+}
 
 case class EnvName(value: String)
 sealed trait EnvValue

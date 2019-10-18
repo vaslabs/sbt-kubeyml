@@ -42,6 +42,8 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
     val expectedMetadataKey = Gen.alphaStr.sample.get
     val expectedMetadataValue = Gen.alphaNumStr.sample.get
     val expectedDockerImage = Gen.alphaNumStr.sample.get
+    val expectedEnvVarName = Gen.alphaUpperStr.sample.get
+    val expectedEnvVarValue = Gen.alphaStr.sample.get
     val deployment = deploy.namespace(expectedNamespace)
       .service(expectedServiceName)
       .withImage(expectedDockerImage)
@@ -52,6 +54,7 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
       .replicas(1)
       .addPorts(List(Port(Some("app"), 8080)))
       .annotateSpecTemplate(Map(expectedMetadataKey -> expectedMetadataValue))
+      .env(expectedEnvVarName, expectedEnvVarValue)
 
     val expectedYaml = parse(
       s"""
@@ -90,6 +93,9 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
         |              port: 8080
         |            initialDelaySeconds: 3
         |            periodSeconds : 5
+        |          env:
+        |            - name: ${expectedEnvVarName}
+        |              value: ${expectedEnvVarValue}
         |""".stripMargin).right.get
 
     deployment.asJson shouldBe expectedYaml

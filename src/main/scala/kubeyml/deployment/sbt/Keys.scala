@@ -2,7 +2,7 @@ package kubeyml.deployment.sbt
 import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, Port, Probe, Resource, Resources}
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerAlias
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 
 import scala.concurrent.duration._
 
@@ -48,20 +48,21 @@ object Keys extends Keys {
           .addEnv((envs in kube).value)
           .requestResource((resourceRequests in kube).value)
           .limit((resourceLimits in kube).value),
-        (target in ThisBuild).value
+        (target in ThisProject).value
       )
     },
-    namespace in kube := (normalizedName in project).value,
-    application in kube := (normalizedName in ThisBuild).value,
-    dockerImage in kube := (dockerAlias).value.toString(),
-    livenessProbe in kube := HttpProbe(
+    namespace := (name in ThisProject).value,
+    application := (name in ThisProject).value,
+    dockerImage := (dockerAlias).value.toString(),
+    ports := dockerExposedPorts.value.toList.map(Port(None, _)),
+    livenessProbe := HttpProbe(
       HttpGet("/health", 8080, List.empty), 5 seconds, 5 seconds, None
     ),
-    readinessProbe in kube := (livenessProbe in kube).value,
-    annotations in kube := Map.empty,
-    replicas in kube := 2,
-    envs in kube := Map.empty,
-    resourceRequests in kube := Resources().requests,
+    readinessProbe := (livenessProbe in kube).value,
+    annotations := Map.empty,
+    replicas := 2,
+    envs := Map.empty,
+    resourceRequests := Resources().requests,
     resourceLimits := Resources().limits
   )
 }

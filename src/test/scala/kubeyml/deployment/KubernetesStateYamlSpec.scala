@@ -27,7 +27,7 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
     deploymentStrategy.asJson shouldBe expectedStrategy
   }
 
-  "image pull policy" must "decode to enumerateable string" in {
+  "image pull policy" must "decode to enumerable string" in {
     val imagePullPolicyAlways: ImagePullPolicy = Always
     val imagePullPolicyIfNotPresent: ImagePullPolicy = IfNotPresent
 

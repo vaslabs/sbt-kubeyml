@@ -58,7 +58,7 @@ lazy val deploymentSettings = Seq(
   envs in kube := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256 -Xmx2048M"),
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),
-    EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key "my-token")
+    EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
   resourceLimits := Resource(Cpu.fromCores(2), Memory(2048+512)),
   resourceRequests := Resource(Cpu(500), Memory(512))

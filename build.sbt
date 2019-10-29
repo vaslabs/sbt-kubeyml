@@ -20,13 +20,13 @@ lazy val `kubeyml` = (project in file("."))
 
 crossScalaVersions := Seq(scala212)
 
-val circeVersion = "0.10.0"
+val circeVersion = "0.12.1"
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-yaml" % circeVersion,
+  "io.circe" %% "circe-yaml" % "0.10.0",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
   "org.scalacheck" %% "scalacheck" % "1.14.1" % Test
 )

@@ -65,7 +65,7 @@ lazy val releaseSettings = {
   import ReleaseTransformations._
 
   Seq(
-    releaseCrossBuild := true,
+    releaseCrossBuild := false,
     releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,

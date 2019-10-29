@@ -45,6 +45,9 @@ kubeyml:gen
 ### Single namespace, two types of deployments with secret and dependency
 
 ```scala
+import kubeyml.deployment.{Cpu, EnvName, EnvRawValue, EnvSecretValue, Memory, Resource}
+import kubeyml.deployment.sbt.Keys._
+
 lazy val deploymentName = sys.env.getOrElse("DEPLOYMENT_NAME", "myservice-test")
 lazy val secretsName = sys.env.getOrElse("SECRETS_NAME", "myservice-test-secrets")
 lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https://localhost:8080")

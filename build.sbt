@@ -19,7 +19,7 @@ lazy val `kubeyml` = (project in file("."))
 
 
 crossScalaVersions := Seq(scala212)
-
+useGpg := true
 val circeVersion = "0.12.1"
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 

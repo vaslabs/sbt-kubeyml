@@ -2,8 +2,6 @@ import xerial.sbt.Sonatype.GitHubHosting
 
 name := "sbt-kubeyml"
 
-version := "0.1.5"
-
 scalaVersion := "2.12.10"
 
 lazy val scala212 = "2.12.10"

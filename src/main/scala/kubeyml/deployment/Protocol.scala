@@ -123,6 +123,12 @@ case class Resource(cpu: Cpu, memory: Memory)
 case class Cpu(value: Int) {
   require(value > 0)
 }
+object Cpu {
+  def fromCores(number: Short): Cpu = {
+    require(number > 0 && number <= 128)
+    Cpu(number*500)
+  }
+}
 case class Memory(value: Int) {
   require(value > 0)
 }

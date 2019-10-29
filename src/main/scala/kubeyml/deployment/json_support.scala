@@ -57,8 +57,11 @@ object json_support {
     httpProbe => {
       val fields: List[(String, Json)] = List("httpGet" -> httpProbe.httpGet.asJson,
         "initialDelaySeconds" -> httpProbe.initialDelay.toSeconds.asJson,
-        "periodSeconds" -> httpProbe.period.toSeconds.asJson
-      ) ++ httpProbe.failureThreshold.map("failureThreshold" -> _.asJson).toList
+        "periodSeconds" -> httpProbe.period.toSeconds.asJson,
+        "timeoutSeconds" -> httpProbe.timeout.toSeconds.asJson,
+        "failureThreshold" -> httpProbe.failureThreshold.asJson,
+        "successThreshold" -> httpProbe.successThreshold.asJson
+      )
 
       Json.obj(
         fields: _*

@@ -77,7 +77,7 @@ object Keys extends Keys {
     dockerImage := (dockerAlias).value.toString(),
     ports := dockerExposedPorts.value.toList.map(Port(None, _)),
     livenessProbe := HttpProbe(
-      HttpGet("/health", 8080, List.empty), 5 seconds, 5 seconds, None
+      HttpGet("/health", 8080, List.empty)
     ),
     readinessProbe := (livenessProbe in kube).value,
     annotations := Map.empty,

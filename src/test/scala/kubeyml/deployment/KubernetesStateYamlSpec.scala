@@ -69,7 +69,7 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
       .service(expectedServiceName)
       .withImage(expectedDockerImage)
       .withProbes(
-        livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), 3 seconds, 5 seconds, None),
+        livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
         readinessProbe = NoProbe
       )
       .replicas(1)
@@ -114,6 +114,9 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
         |              port: 8080
         |            initialDelaySeconds: 3
         |            periodSeconds : 5
+        |            successThreshold: 1
+        |            failureThreshold: 3
+        |            timeoutSeconds: 1
         |          resources:
         |            requests:
         |              memory: "256Mi"

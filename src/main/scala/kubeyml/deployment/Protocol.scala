@@ -21,7 +21,7 @@
 
 package kubeyml.deployment
 
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
 
 sealed trait KubernetesState
 
@@ -164,7 +164,13 @@ case class EnvVarDefinition(name: String, value: EnvValue)
 
 // For more probes go https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 sealed trait Probe
-case class HttpProbe(httpGet: HttpGet, initialDelay: FiniteDuration, period: FiniteDuration, failureThreshold: Option[Short]) extends Probe
+case class HttpProbe(httpGet: HttpGet,
+                     initialDelay: FiniteDuration = 0 seconds,
+                     timeout: FiniteDuration = 1 second,
+                     period: FiniteDuration = 10 seconds,
+                     failureThreshold: Short = 3,
+                     successThreshold: Short = 1
+) extends Probe
 case object NoProbe extends Probe
 
 case class HttpGet(path: String, port: Int, httpHeaders: List[Header])

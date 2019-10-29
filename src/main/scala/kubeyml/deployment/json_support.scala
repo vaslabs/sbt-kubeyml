@@ -21,7 +21,7 @@
 
 package kubeyml.deployment
 
-import io.circe.{Encoder, Json, ObjectEncoder}
+import io.circe.{Encoder, Json}
 
 object json_support {
 

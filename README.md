@@ -105,8 +105,6 @@ publish-prod:
     - export DEPLOYMENT_NAME=my-service-prod
   extends: .publish-template
 
-
-
 deploy-prod:
   extends: .deploy-template
   dependencies:

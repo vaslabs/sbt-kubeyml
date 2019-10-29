@@ -72,47 +72,45 @@ stages:
   - publish-image
   - deploy
 
+.publish-template:
+  stage: publish-image
+  script:
+      - sbt docker:publishLocal
+      - sbt kubeyml:gen
+  artifacts:
+      untracked: true
+      paths:
+        - target/kubeyml/deployment.yml
+
+.deploy-template:
+  stage: deploy
+  image: docker-image-that-has-your-kubectl-config
+  script:
+     - kubectl apply -f target/kubeyml/deployment.yml
+
 publish-test:
-    stage: publish-image
-    before_script:
-        export MY_DEPENDENCY=${MY_TEST_DEPENDENCY}
-    script:
-        - sbt docker:publishLocal
-        - sbt kubeyml:gen
-    artifacts:
-        untracked: true
-        paths:
-          - target/kubeyml/deployment.yml
+  before_script:
+      export MY_DEPENDENCY=${MY_TEST_DEPENDENCY}
+  extends: .publish-template
 
 deploy-test:
-    stage: deploy
-    image: docker-image-that-has-your-kubectl-config
-    script:
-       - kubectl apply -f target/kubeyml/deployment.yml
-    dependencies:
-       - publish-test
+  extends: .deploy-template
+  dependencies:
+     - publish-test
 
 publish-prod:
-    stage: publish-image
-    before_script:
-        - export MY_DEPENDENCY=${MY_PROD_DEPENDENCY}
-        - export SECRETS_NAME=${MY_PROD_SECRET_NAME}
-        - export DEPLOYMENT_NAME=my-service-prod
-    script:
-        - sbt docker:publishLocal
-        - sbt kubeyml:gen
-    artifacts:
-        untracked: true
-        paths:
-          - target/kubeyml/deployment.yml
+  before_script:
+    - export MY_DEPENDENCY=${MY_PROD_DEPENDENCY}
+    - export SECRETS_NAME=${MY_PROD_SECRET_NAME}
+    - export DEPLOYMENT_NAME=my-service-prod
+  extends: .publish-template
+
+
 
 deploy-prod:
-    stage: deploy
-    image: docker-image-that-has-your-kubectl-config
-    script:
-     - kubectl apply -f target/kubeyml/deployment.yml
-    dependencies:
-     - publish-prod
+  extends: .deploy-template
+  dependencies:
+   - publish-prod
 ```
 
 

@@ -11,6 +11,7 @@ lazy val scala212 = "2.12.10"
 crossScalaVersions := Seq(scala212)
 
 val circeVersion = "0.10.0"
+credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,

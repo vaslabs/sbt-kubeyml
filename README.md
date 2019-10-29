@@ -1,5 +1,5 @@
 # sbt-kubeyml
-WIP: An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
+An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
 
 ## Usage
 

@@ -60,8 +60,8 @@ lazy val deploymentSettings = Seq(
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
-  resourceLimits := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests := Resource(Cpu(500), Memory(512))
+  resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
+  resourceRequests in kube := Resource(Cpu(500), Memory(512))
 )
 ```
 

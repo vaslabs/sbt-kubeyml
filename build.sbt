@@ -55,6 +55,8 @@ lazy val publishSettings = Seq(
       url   = url("http://vaslabs.org")
     )
   ),
+  publishConfiguration := publishConfiguration.value.withOverwrite(true),
+  publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
   publishMavenStyle := true,
   licenses := List("MIT" -> new URL("https://opensource.org/licenses/MIT")),
   homepage := Some(url("https://git.vaslabs.org/vaslabs/sbt-kubeyml")),

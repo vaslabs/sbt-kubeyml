@@ -8,6 +8,16 @@ scalaVersion := "2.12.10"
 
 lazy val scala212 = "2.12.10"
 
+lazy val `kubeyml` = (project in file("."))
+  .enablePlugins(AutomateHeaderPlugin, SbtPlugin)
+  .settings(pluginSettings)
+  .settings(
+    name := "sbt-kubeyml"
+  ).settings(publishSettings)
+  .settings(releaseSettings)
+  .settings(pluginSettings)
+
+
 crossScalaVersions := Seq(scala212)
 
 val circeVersion = "0.10.0"
@@ -75,7 +85,3 @@ lazy val releaseSettings = {
     )
   )
 }
-
-publishSettings
-pluginSettings
-releaseSettings

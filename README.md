@@ -109,8 +109,8 @@ publish-prod:
 deploy-prod:
     stage: deploy
     image: docker-image-that-has-your-kubectl-config
-script:
-    - kubectl apply -f target/kubeyml/deployment.yml
+    script:
+     - kubectl apply -f target/kubeyml/deployment.yml
     dependencies:
      - publish-prod
 ```

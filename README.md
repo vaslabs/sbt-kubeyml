@@ -5,7 +5,7 @@ An sbt plugin to generate typesafe kubernetes deployment plans for scala project
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.1.9")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.0")
 ```
 
 Add the plugin in your project and enable it
@@ -33,7 +33,7 @@ kubeyml:gen
 |  dockerImage | The docker image to deploy in a single container |  Default is the picked from sbt-native-packager |
 | livenessProbe  | Healtcheck probe  | `HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)` |
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
-| annotations  | Fre `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
+| annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
 | resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(500), Memory(256))` |

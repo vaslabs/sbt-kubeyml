@@ -31,6 +31,7 @@ kubeyml:gen
 | namespace  | The kubernetes namespace of the deployment   |  Default value is project name | 
 |  application | The name of the deployment  |  Default value is project name  |
 |  dockerImage | The docker image to deploy in a single container |  Default is the picked from sbt-native-packager |
+| ports | List of container ports optionally tagged with name | dockerExposedPorts from docker plugin|
 | livenessProbe  | Healtcheck probe  | `HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)` |
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |

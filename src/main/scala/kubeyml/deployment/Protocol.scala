@@ -147,7 +147,7 @@ case class Cpu(value: Int) {
 object Cpu {
   def fromCores(number: Short): Cpu = {
     require(number > 0 && number <= 128)
-    Cpu(number*500)
+    Cpu(number*1000)
   }
 }
 case class Memory(value: Int) {

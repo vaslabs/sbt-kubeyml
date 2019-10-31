@@ -33,7 +33,7 @@ import sbt.AutoPlugin
 object Plugin {
   def generate(deployment: Deployment, buildTarget: File): Unit = {
     val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdir()
+    genTarget.mkdirs()
     val file = new File(genTarget, "deployment.yml")
     val printWriter = new PrintWriter(file)
     try {

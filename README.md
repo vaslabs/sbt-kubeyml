@@ -5,7 +5,7 @@ An sbt plugin to generate typesafe kubernetes deployment plans for scala project
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.0")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.1")
 ```
 
 Add the plugin in your project and enable it

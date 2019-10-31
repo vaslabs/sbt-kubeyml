@@ -47,7 +47,7 @@ kubeyml:gen
 
 ```scala
 import kubeyml.deployment.{Cpu, EnvName, EnvRawValue, EnvSecretValue, Memory, Resource}
-import kubeyml.deployment.sbt.Keys._
+import kubeyml.deployment.plugin.Keys._
 
 lazy val deploymentName = sys.env.getOrElse("DEPLOYMENT_NAME", "myservice-test")
 lazy val secretsName = sys.env.getOrElse("SECRETS_NAME", "myservice-test-secrets")

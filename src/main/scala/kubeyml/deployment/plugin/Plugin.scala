@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.sbt
+package kubeyml.deployment.plugin
 
 import java.io.{File, PrintWriter}
 

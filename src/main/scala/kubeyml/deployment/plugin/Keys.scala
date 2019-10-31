@@ -19,13 +19,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.sbt
+package kubeyml.deployment.plugin
 import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, Port, Probe, Resource, Resources}
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
-
-import scala.concurrent.duration._
 
 trait Keys {
   val dockerImage = settingKey[String]("The docker image to deploy")

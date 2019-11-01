@@ -1,4 +1,4 @@
-# sbt-kubeyml [![CircleCI](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg)](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml)
+# sbt-kubeyml [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1a2b9682f101488cb8bf5589e5bd7310)](https://www.codacy.com/manual/vaslabs/sbt-kubeyml?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vaslabs/sbt-kubeyml&amp;utm_campaign=Badge_Grade) [![CircleCI](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg)](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml)
 An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
 
 ## Usage

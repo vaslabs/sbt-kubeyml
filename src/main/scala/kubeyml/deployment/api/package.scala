@@ -26,6 +26,13 @@ package object api {
   def deploy: EmptyDeployment =
     EmptyDeployment
 
+  implicit def toNonEmptyString(value: String): NonEmptyString = {
+    require(!value.isEmpty)
+    NonEmptyString(value)
+  }
+
+  implicit def fromNonEmptyString(value: NonEmptyString): String = value.value
+
 
   implicit final class KubernetesDeploymentOps(val kubernetesDeployment: EmptyDeployment) extends AnyVal {
     def namespace(name: String): NamespaceDeployment =  NamespaceDeployment(name)

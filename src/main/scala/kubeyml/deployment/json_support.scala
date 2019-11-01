@@ -104,6 +104,9 @@ object json_support {
       "secretKeyRef" -> secretValue.asJson
     )
   }
+
+  implicit val nonEmptyStringEncoder: Encoder[NonEmptyString] = Encoder.encodeString.contramap(_.value)
+
   private val envRawValueEncoder: Encoder[EnvRawValue] = Encoder.encodeString.contramap(_.value)
 
   implicit val envValueEncoder: Encoder[EnvValue] = Encoder.instance {

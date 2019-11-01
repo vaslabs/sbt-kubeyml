@@ -19,12 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.api
+package kubeyml.deployment
 
-sealed trait EmptyDeployment
-object EmptyDeployment extends EmptyDeployment
-case class NamespaceDeployment(namespace: String)
-case class AppDeployment(namespace: String, service: String)
-case class DockerisedAppDeployment(namespace: String, service: String, image: String) {
-  require(image.length > 0)
+import org.scalatest.{FlatSpec, Matchers, WordSpec}
+import api._
+
+class DeploymentGuaranteesSpec extends WordSpec with Matchers{
+
+  "deployment" must {
+    "not accept empty docker images" in {
+      assertThrows[IllegalArgumentException](
+        deploy.namespace("namespace").service("application").withImage("")
+      )
+    }
+  }
 }

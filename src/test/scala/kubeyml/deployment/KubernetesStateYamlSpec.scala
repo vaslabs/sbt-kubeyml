@@ -22,30 +22,35 @@
 package kubeyml.deployment
 
 import io.circe.Json
-import org.scalatest.{FlatSpec, Matchers}
-import io.circe.yaml.parser._
-import io.circe.syntax._
 import io.circe.generic.auto._
-import json_support._
-import org.scalacheck.Gen
+import io.circe.syntax._
+import io.circe.yaml.parser._
+import kubeyml.deployment.api._
+import kubeyml.deployment.json_support._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.{FlatSpec, Matchers}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
 
-class KubernetesStateYamlSpec extends FlatSpec with Matchers{
+class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks{
+  import KubernetesStateYamlSpec._
 
   "deployment strategy" must "have the correct schema" in {
-    val expectedStrategy = parse(
-      """
-        |type: RollingUpdate
-        |rollingUpdate:
-        |   maxSurge: 0
-        |   maxUnavailable: 1
-        |""".stripMargin
-    ).right.get
-    RollingUpdate().asJson shouldBe expectedStrategy
-
-    val deploymentStrategy: DeploymentStrategy = RollingUpdate()
-    deploymentStrategy.asJson shouldBe expectedStrategy
+    forAll {
+      (maxSurge: Int, maxUnavailable: Int) =>
+        whenever(maxSurge >= 0 && maxUnavailable >= 0) {
+          val expectedStrategy = parse(
+            s"""
+               |type: RollingUpdate
+               |rollingUpdate:
+               |   maxSurge: ${maxSurge}
+               |   maxUnavailable: ${maxUnavailable}
+               |""".stripMargin
+          )
+            Right(RollingUpdate(maxSurge, maxUnavailable).asJson) shouldBe expectedStrategy
+        }
+      }
   }
 
   "image pull policy" must "decode to enumerable string" in {
@@ -57,82 +62,109 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
   }
 
   "kubernetes sample" must "be generated from definition" in {
-    import api._
-    val expectedServiceName = Gen.alphaStr.sample.get
-    val expectedNamespace = Gen.alphaStr.sample.get
-    val expectedMetadataKey = Gen.alphaStr.sample.get
-    val expectedMetadataValue = Gen.alphaNumStr.sample.get
-    val expectedDockerImage = Gen.alphaNumStr.sample.get
-    val expectedEnvVarName = Gen.alphaUpperStr.sample.get
-    val expectedEnvVarValue = Gen.alphaStr.sample.get
-    val deployment = deploy.namespace(expectedNamespace)
-      .service(expectedServiceName)
-      .withImage(expectedDockerImage)
-      .withProbes(
-        livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
-        readinessProbe = NoProbe
-      )
-      .replicas(1)
-      .addPorts(List(Port(Some("app"), 8080)))
-      .annotateSpecTemplate(Map(expectedMetadataKey -> expectedMetadataValue))
-      .env(expectedEnvVarName, expectedEnvVarValue)
+    implicit val arbTest = Properties.lowEmptyChance
+    forAll { deploymentTestParts: DeploymentTestParts =>
+        import deploymentTestParts._
+        whenever(nonEmptyParts(deploymentTestParts)) {
+          val deployment = deploy.namespace(namespace)
+            .service(serviceName)
+            .withImage(dockerImage)
+            .withProbes(
+              livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
+              readinessProbe = NoProbe
+            )
+            .replicas(1)
+            .addPorts(List(Port(Some("app"), 8080)))
+            .annotateSpecTemplate(Map(metadataKey -> metadataValue))
+            .env(envName, envValue)
 
-    val expectedYaml = parse(
-      s"""
-        |apiVersion: apps/v1
-        |kind: Deployment
-        |metadata:
-        |  name: &name ${expectedServiceName}
-        |  namespace: ${expectedNamespace}
-        |spec:
-        |  replicas: 1
-        |  selector:
-        |    matchLabels:
-        |      app: *name
-        |  strategy:
-        |    type: RollingUpdate
-        |    rollingUpdate:
-        |      maxSurge: 0
-        |      maxUnavailable: 1
-        |  template:
-        |    metadata:
-        |      labels:
-        |        app: *name
-        |      annotations:
-        |        ${expectedMetadataKey}: ${expectedMetadataValue}
-        |    spec:
-        |      containers:
-        |        - image: ${expectedDockerImage}
-        |          imagePullPolicy: Always
-        |          name: *name
-        |          ports:
-        |            - name: app
-        |              containerPort: 8080
-        |          livenessProbe:
-        |            httpGet:
-        |              path: /health
-        |              port: 8080
-        |            initialDelaySeconds: 3
-        |            periodSeconds : 5
-        |            successThreshold: 1
-        |            failureThreshold: 3
-        |            timeoutSeconds: 1
-        |          resources:
-        |            requests:
-        |              memory: "256Mi"
-        |              cpu: "500m"
-        |            limits:
-        |              memory: "512Mi"
-        |              cpu: "1000m"
-        |          env:
-        |            - name: ${expectedEnvVarName}
-        |              value: ${expectedEnvVarValue}
-        |""".stripMargin).right.get
+          val expectedYaml = parse(
+            s"""
+               |apiVersion: apps/v1
+               |kind: Deployment
+               |metadata:
+               |  name: &name ${serviceName}
+               |  namespace: ${namespace}
+               |spec:
+               |  replicas: 1
+               |  selector:
+               |    matchLabels:
+               |      app: *name
+               |  strategy:
+               |    type: RollingUpdate
+               |    rollingUpdate:
+               |      maxSurge: 0
+               |      maxUnavailable: 1
+               |  template:
+               |    metadata:
+               |      labels:
+               |        app: *name
+               |      annotations:
+               |        ${metadataKey}: ${metadataValue}
+               |    spec:
+               |      containers:
+               |        - image: ${dockerImage}
+               |          imagePullPolicy: Always
+               |          name: *name
+               |          ports:
+               |            - name: app
+               |              containerPort: 8080
+               |          livenessProbe:
+               |            httpGet:
+               |              path: /health
+               |              port: 8080
+               |            initialDelaySeconds: 3
+               |            periodSeconds : 5
+               |            successThreshold: 1
+               |            failureThreshold: 3
+               |            timeoutSeconds: 1
+               |          resources:
+               |            requests:
+               |              memory: "256Mi"
+               |              cpu: "500m"
+               |            limits:
+               |              memory: "512Mi"
+               |              cpu: "1000m"
+               |          env:
+               |            - name: ${envName}
+               |              value: ${envValue}
+               |""".stripMargin).right.get
+          if (expectedYaml != deployment.asJson) {
+            println(expectedYaml.noSpaces)
+            println(deployment.asJson.noSpaces)
+          }
+          deployment.asJson shouldBe expectedYaml
+        }
+    }
+  }
 
-    deployment.asJson shouldBe expectedYaml
+  "kubernetes deployment" must "report an error" in {
+    implicit val arbTest = Properties.highEmptyChance
+
+    forAll {
+      deploymentParts: DeploymentTestParts =>
+        whenever(!nonEmptyParts(deploymentParts)) {
+          import deploymentParts._
+          assertThrows[IllegalArgumentException](
+            deploy.namespace(namespace)
+              .service(serviceName)
+              .withImage(dockerImage)
+              .withProbes(
+                livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
+                readinessProbe = NoProbe
+              )
+              .replicas(1)
+              .addPorts(List(Port(Some("app"), 8080)))
+              .annotateSpecTemplate(Map(metadataKey -> metadataValue))
+              .env(envName, envValue)
+          )
+        }
+    }
   }
 
   "environment variables" must "decode to list of key values" in {
+    implicit val arbTest = Properties.highEmptyChance
+
     val expectedFieldPathName = Gen.alphaUpperStr.sample.get
     val expectedFieldPathValue = Gen.alphaLowerStr.sample.get
 
@@ -181,4 +213,44 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers{
     ).right.get
   }
 
+}
+
+object KubernetesStateYamlSpec {
+  case class DeploymentTestParts(serviceName: String, namespace: String,
+                                 metadataKey: String, metadataValue: String,
+                                 dockerImage: String, envName: String, envValue: String)
+
+  private def strOrEmpty: Gen[String] = Gen.oneOf(Gen.const(""), Gen.alphaNumStr)
+
+  def nonEmptyParts(deploymentTestParts: DeploymentTestParts) = {
+    import deploymentTestParts._
+    Seq(namespace, dockerImage, serviceName, envName, metadataKey, metadataValue).forall(_.nonEmpty)
+  }
+
+  object Properties {
+    val highEmptyChance: Arbitrary[DeploymentTestParts] = Arbitrary(
+      for {
+        serviceName <- strOrEmpty
+        namespace <- strOrEmpty
+        metaKey <- strOrEmpty
+        metaValue <- strOrEmpty
+        dockerImage <- strOrEmpty
+        envName <- strOrEmpty
+        envValue <- strOrEmpty
+      } yield DeploymentTestParts(serviceName, namespace, metaKey, metaValue, dockerImage, envName, envValue)
+    )
+
+    val lowEmptyChance: Arbitrary[DeploymentTestParts] = Arbitrary(
+      for {
+        serviceName <- Gen.alphaNumStr
+        namespace <- Gen.alphaNumStr
+        metaKey <- Gen.alphaNumStr
+        metaValue <- Gen.alphaNumStr
+        dockerImage <- Gen.alphaNumStr
+        envName <- Gen.alphaNumStr
+        envValue <- Gen.alphaNumStr
+      } yield DeploymentTestParts(serviceName, namespace, metaKey, metaValue, dockerImage, envName, envValue)
+    )
+
+  }
 }

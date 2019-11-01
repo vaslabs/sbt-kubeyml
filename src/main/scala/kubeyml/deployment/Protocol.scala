@@ -26,7 +26,7 @@ import scala.concurrent.duration._
 sealed trait KubernetesState
 
 case class Deployment(
-  apiVersion: String = "apps/v1",
+  apiVersion: NonEmptyString = NonEmptyString("apps/v1"),
   metadata: DeploymentMetadata,
   spec: Spec
 ) extends KubernetesState {
@@ -45,12 +45,12 @@ case class Deployment(
 }
 
 case class DeploymentMetadata(
-  name: String,
-  namespace: String
+  name: NonEmptyString,
+  namespace: NonEmptyString
 )
 
 
-case class Labels(app: String)
+case class Labels(app: NonEmptyString)
 
 case class Spec(
   replicas: Int,
@@ -77,13 +77,24 @@ case class Selector(
 )
 
 case class MatchLabels(app: Option[String])
+object MatchLabels {
+  def apply(app: String): MatchLabels =
+    if (app.isEmpty)
+      apply(None)
+    else
+      apply(Some(app))
+}
 
 case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
   private[deployment] def addContainerPorts(ports: List[Port]): Template =
     this.copy(spec = spec.addContainerPorts(ports))
 
-  private[deployment] def annotate(annotations: Map[String, String]): Template =
+  private[deployment] def annotate(annotations: Map[String, String]): Template = {
+    require(annotations.forall {
+      case (key, value) => key.nonEmpty && value.nonEmpty
+    })
     this.copy(metadata = metadata.copy(annotations = annotations))
+  }
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
     this.copy(spec = spec.addContainerEnvs(envs))
@@ -113,8 +124,8 @@ case class TemplateSpec(containers: List[Container]) {
 }
 
 case class Container(
-    name: String,
-    image: String,
+    name: NonEmptyString,
+    image: NonEmptyString,
     ports: List[Port],
     imagePullPolicy: ImagePullPolicy,
     livenessProbe: Probe,
@@ -154,13 +165,13 @@ case class Memory(value: Int) {
   require(value > 0)
 }
 
-case class EnvName(value: String)
+case class EnvName(value: NonEmptyString)
 sealed trait EnvValue
 case class EnvRawValue(value: String) extends EnvValue
-case class EnvFieldValue(fieldPath: String) extends EnvValue
-case class EnvSecretValue(name: String, key: String) extends EnvValue
+case class EnvFieldValue(fieldPath: NonEmptyString) extends EnvValue
+case class EnvSecretValue(name: NonEmptyString, key: NonEmptyString) extends EnvValue
 
-case class EnvVarDefinition(name: String, value: EnvValue)
+case class EnvVarDefinition(name: NonEmptyString, value: EnvValue)
 
 // For more probes go https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 sealed trait Probe
@@ -173,11 +184,19 @@ case class HttpProbe(httpGet: HttpGet,
 ) extends Probe
 case object NoProbe extends Probe
 
-case class HttpGet(path: String, port: Int, httpHeaders: List[Header])
+case class HttpGet(path: NonEmptyString, port: Int, httpHeaders: List[Header])
 
-case class Header(name: String, value: String)
+case class Header(name: NonEmptyString, value: NonEmptyString)
 
 case class Port(name: Option[String], containerPort: Int)
+
+object Port {
+  def apply(name: String, containerPort: Int): Port =
+    if (name.isEmpty)
+      apply(None, containerPort)
+    else
+      apply(Some(name), containerPort)
+}
 
 sealed trait DeploymentStrategy
 
@@ -188,3 +207,7 @@ sealed trait ImagePullPolicy
 
 case object Always extends ImagePullPolicy
 case object IfNotPresent extends ImagePullPolicy
+
+case class NonEmptyString(value: String) {
+  require(value.nonEmpty)
+}

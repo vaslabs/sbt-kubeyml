@@ -1,4 +1,4 @@
-# sbt-kubeyml
+# sbt-kubeyml [![CircleCI](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg)](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master)
 An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
 
 ## Usage

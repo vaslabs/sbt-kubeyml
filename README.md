@@ -77,7 +77,7 @@ stages:
 .publish-template:
   stage: publish-image
   script:
-      - sbt docker:publishLocal
+      - sbt docker:publish
       - sbt kubeyml:gen
   artifacts:
       untracked: true

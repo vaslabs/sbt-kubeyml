@@ -12,7 +12,7 @@ Add the plugin in your project and enable it
 ```
 enablePlugins(KubeDeploymentPlugin)
 ```
-The plugin depends on a bunch of other plugins (sbt-native-packager)
+The plugin depends on a bunch of other plugins ([sbt-native-packager](https://github.com/sbt/sbt-native-packager))
 
 ```
 enablePlugins(DockerPlugin)

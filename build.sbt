@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-yaml" % "0.10.0",
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.14.1" % Test
+  "org.scalacheck" %% "scalacheck" % "1.14.2" % Test
 )
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.4.1")
 

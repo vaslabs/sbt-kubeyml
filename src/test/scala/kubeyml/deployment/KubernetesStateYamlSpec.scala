@@ -83,8 +83,8 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |apiVersion: apps/v1
                |kind: Deployment
                |metadata:
-               |  name: &name ${serviceName}
-               |  namespace: ${namespace}
+               |  name: &name "${serviceName}"
+               |  namespace: "${namespace}"
                |spec:
                |  replicas: 1
                |  selector:
@@ -100,10 +100,10 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |      labels:
                |        app: *name
                |      annotations:
-               |        ${metadataKey}: ${metadataValue}
+               |        ${metadataKey}: "${metadataValue}"
                |    spec:
                |      containers:
-               |        - image: ${dockerImage}
+               |        - image: "${dockerImage}"
                |          imagePullPolicy: Always
                |          name: *name
                |          ports:
@@ -126,8 +126,8 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |              memory: "512Mi"
                |              cpu: "1000m"
                |          env:
-               |            - name: ${envName}
-               |              value: ${envValue}
+               |            - name: "${envName}"
+               |              value: "${envValue}"
                |""".stripMargin).right.get
           if (expectedYaml != deployment.asJson) {
             println(expectedYaml.noSpaces)

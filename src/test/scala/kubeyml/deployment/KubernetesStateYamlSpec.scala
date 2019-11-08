@@ -130,12 +130,21 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |          env:
                |            - name: "${envName}"
                |              value: "${envValue}"
-               |""".stripMargin).right.get
-        if (expectedYaml != deployment.asJson) {
-          println(expectedYaml.noSpaces)
-          println(deployment.asJson.noSpaces)
+               |""".stripMargin)
+
+        val someYaml = expectedYaml match {
+          case Left(err) =>
+            sys.error(err.message)
+            None
+          case Right(yaml) if yaml != deployment.asJson =>
+            println(yaml.noSpaces)
+            println(deployment.asJson.noSpaces)
+            deployment.asJson shouldBe yaml
+            Some(yaml)
+          case Right(yaml) => Some(yaml)
         }
-        deployment.asJson shouldBe expectedYaml
+        assert(someYaml.nonEmpty)
+
       }
     }
   }

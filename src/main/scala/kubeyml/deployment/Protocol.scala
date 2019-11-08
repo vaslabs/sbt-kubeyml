@@ -37,6 +37,9 @@ case class Deployment(
   private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
     this.copy(spec = spec.addContainerEnvs(envs))
 
+  private[kubeyml] def addCommand(command: Seq[String]): Deployment =
+    this.copy(spec = spec.addContainerCmd(command))
+
   private[kubeyml] def request(resource: Resource): Deployment =
     this.copy(spec = spec.limitResource(resource))
 
@@ -48,7 +51,6 @@ case class DeploymentMetadata(
   name: NonEmptyString,
   namespace: NonEmptyString
 )
-
 
 case class Labels(app: NonEmptyString)
 
@@ -65,6 +67,9 @@ case class Spec(
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
     this.copy(template = template.addContainerEnvs(envs))
 
+  private[deployment] def addContainerCmd(command: Seq[String]): Spec =
+    this.copy(template = template.addContainerCmd(command))
+
   private[deployment] def requestResource(resource: Resource): Spec =
     this.copy(template = template.requestResource(resource))
 
@@ -77,7 +82,9 @@ case class Selector(
 )
 
 case class MatchLabels(app: Option[String])
+
 object MatchLabels {
+
   def apply(app: String): MatchLabels =
     if (app.isEmpty)
       apply(None)
@@ -86,6 +93,7 @@ object MatchLabels {
 }
 
 case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
+
   private[deployment] def addContainerPorts(ports: List[Port]): Template =
     this.copy(spec = spec.addContainerPorts(ports))
 
@@ -95,6 +103,9 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
     })
     this.copy(metadata = metadata.copy(annotations = annotations))
   }
+
+  private[deployment] def addContainerCmd(command: Seq[String]): Template =
+    this.copy(spec = spec.addContainerCmd(command))
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
     this.copy(spec = spec.addContainerEnvs(envs))
@@ -110,10 +121,11 @@ case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
 
 case class TemplateSpec(containers: List[Container]) {
   private[deployment] def addContainerPorts(ports: List[Port]): TemplateSpec =
-    this.copy(containers = containers.map {
-      container => container.copy(ports = container.ports ++ ports)
-    }
-  )
+    this.copy(containers = containers.map { container =>
+      container.copy(ports = container.ports ++ ports)
+    })
+  private[deployment] def addContainerCmd(command: Seq[String]): TemplateSpec =
+    this.copy(containers = containers.map(_.addCommand(command)))
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
     this.copy(containers = containers.map(_.addEnvs(envs)))
   private[deployment] def requestResource(resource: Resource): TemplateSpec =
@@ -124,18 +136,20 @@ case class TemplateSpec(containers: List[Container]) {
 }
 
 case class Container(
-    name: NonEmptyString,
-    image: NonEmptyString,
-    ports: List[Port],
-    imagePullPolicy: ImagePullPolicy,
-    livenessProbe: Probe,
-    readinessProbe: Probe,
-    env: Map[EnvName, EnvValue],
-    resources: Resources = Resources()
+  name: NonEmptyString,
+  image: NonEmptyString,
+  command: Seq[String],
+  ports: List[Port],
+  imagePullPolicy: ImagePullPolicy,
+  livenessProbe: Probe,
+  readinessProbe: Probe,
+  env: Map[EnvName, EnvValue],
+  resources: Resources = Resources()
 ) {
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
-
+  private[deployment] def addCommand(command: Seq[String]): Container =
+    this.copy(command = command)
   private[deployment] def requestResource(resource: Resource): Container =
     this.copy(resources = resources.copy(requests = resource))
   private[deployment] def limitResource(resource: Resource): Container =
@@ -143,8 +157,8 @@ case class Container(
 }
 
 case class Resources(
-      requests: Resource = Resource(Cpu(500), Memory(256)),
-      limits: Resource = Resource(Cpu(1000), Memory(512))
+  requests: Resource = Resource(Cpu(500), Memory(256)),
+  limits: Resource = Resource(Cpu(1000), Memory(512))
 ) {
   require(requests.cpu.value <= limits.cpu.value)
   require(requests.memory.value <= limits.memory.value)
@@ -155,10 +169,12 @@ case class Resource(cpu: Cpu, memory: Memory)
 case class Cpu(value: Int) {
   require(value > 0)
 }
+
 object Cpu {
+
   def fromCores(number: Short): Cpu = {
     require(number > 0 && number <= 128)
-    Cpu(number*1000)
+    Cpu(number * 1000)
   }
 }
 case class Memory(value: Int) {
@@ -180,8 +196,8 @@ case class HttpProbe(httpGet: HttpGet,
                      timeout: FiniteDuration = 1 second,
                      period: FiniteDuration = 10 seconds,
                      failureThreshold: Short = 3,
-                     successThreshold: Short = 1
-) extends Probe
+                     successThreshold: Short = 1)
+    extends Probe
 case object NoProbe extends Probe
 
 case class HttpGet(path: NonEmptyString, port: Int, httpHeaders: List[Header])
@@ -191,6 +207,7 @@ case class Header(name: NonEmptyString, value: NonEmptyString)
 case class Port(name: Option[String], containerPort: Int)
 
 object Port {
+
   def apply(name: String, containerPort: Int): Port =
     if (name.isEmpty)
       apply(None, containerPort)
@@ -201,7 +218,6 @@ object Port {
 sealed trait DeploymentStrategy
 
 case class RollingUpdate(maxSurge: Int = 0, maxUnavailable: Int = 1) extends DeploymentStrategy
-
 
 sealed trait ImagePullPolicy
 

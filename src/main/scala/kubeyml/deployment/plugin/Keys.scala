@@ -27,7 +27,9 @@ import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 
 trait Keys {
   val dockerImage = settingKey[String]("The docker image to deploy")
-  val namespace = settingKey[String]("The namespace that the application will be deployed to")
+
+  val namespace =
+    settingKey[String]("The namespace that the application will be deployed to")
   val application = settingKey[String]("The application name")
 
   val livenessProbe = settingKey[Probe]("The liveness probe for healthchecks")
@@ -37,10 +39,14 @@ trait Keys {
   val replicas = settingKey[Int]("The number of replicas of the application")
   val annotations = settingKey[Map[String, String]]("Wildcard for setting annotations on the deployment spec")
 
-  val resourceLimits = settingKey[Resource]("Cpu and memory limit for the container")
-  val resourceRequests = settingKey[Resource]("Cpu and memory request, must not exceed limits")
+  val resourceLimits =
+    settingKey[Resource]("Cpu and memory limit for the container")
+
+  val resourceRequests =
+    settingKey[Resource]("Cpu and memory request, must not exceed limits")
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
+  val containerCmd = settingKey[Seq[String]]("Command for the container")
 
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
 
@@ -52,18 +58,24 @@ object Keys extends Keys {
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := {
       Plugin.generate(
-        deploy.namespace(
-          (namespace in kube).value
-        ).service(
-          (application in kube).value
-        ).withImage(
-          (dockerImage in kube).value
-        ).withProbes(
-          (livenessProbe in kube).value,
-          (readinessProbe in kube).value
-        ).addContainerPorts((ports in kube).value)
+        deploy
+          .namespace(
+            (namespace in kube).value
+          )
+          .service(
+            (application in kube).value
+          )
+          .withImage(
+            (dockerImage in kube).value
+          )
+          .withProbes(
+            (livenessProbe in kube).value,
+            (readinessProbe in kube).value
+          )
+          .addContainerPorts((ports in kube).value)
           .annotateSpecTemplate((annotations in kube).value)
           .replicas((replicas in kube).value)
+          .addCommand((containerCmd in kube).value)
           .addEnv((envs in kube).value)
           .requestResource((resourceRequests in kube).value)
           .limit((resourceLimits in kube).value),
@@ -80,6 +92,7 @@ object Keys extends Keys {
     readinessProbe := (livenessProbe in kube).value,
     annotations := Map.empty,
     replicas := 2,
+    containerCmd := Seq.empty[String],
     envs := Map.empty,
     resourceRequests := Resources().requests,
     resourceLimits := Resources().limits

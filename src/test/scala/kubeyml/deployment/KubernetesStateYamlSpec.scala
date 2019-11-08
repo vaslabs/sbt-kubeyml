@@ -33,24 +33,23 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
 
-class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks{
+class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
   import KubernetesStateYamlSpec._
 
   "deployment strategy" must "have the correct schema" in {
-    forAll {
-      (maxSurge: Int, maxUnavailable: Int) =>
-        whenever(maxSurge >= 0 && maxUnavailable >= 0) {
-          val expectedStrategy = parse(
-            s"""
+    forAll { (maxSurge: Int, maxUnavailable: Int) =>
+      whenever(maxSurge >= 0 && maxUnavailable >= 0) {
+        val expectedStrategy = parse(
+          s"""
                |type: RollingUpdate
                |rollingUpdate:
                |   maxSurge: ${maxSurge}
                |   maxUnavailable: ${maxUnavailable}
                |""".stripMargin
-          )
-            Right(RollingUpdate(maxSurge, maxUnavailable).asJson) shouldBe expectedStrategy
-        }
+        )
+        Right(RollingUpdate(maxSurge, maxUnavailable).asJson) shouldBe expectedStrategy
       }
+    }
   }
 
   "image pull policy" must "decode to enumerable string" in {
@@ -64,22 +63,23 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
   "kubernetes sample" must "be generated from definition" in {
     implicit val arbTest = Properties.lowEmptyChance
     forAll { deploymentTestParts: DeploymentTestParts =>
-        import deploymentTestParts._
-        whenever(nonEmptyParts(deploymentTestParts)) {
-          val deployment = deploy.namespace(namespace)
-            .service(serviceName)
-            .withImage(dockerImage)
-            .withProbes(
-              livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
-              readinessProbe = NoProbe
-            )
-            .replicas(1)
-            .addPorts(List(Port(Some("app"), 8080)))
-            .annotateSpecTemplate(Map(metadataKey -> metadataValue))
-            .env(envName, envValue)
+      import deploymentTestParts._
+      whenever(nonEmptyParts(deploymentTestParts)) {
+        val deployment = deploy
+          .namespace(namespace)
+          .service(serviceName)
+          .withImage(dockerImage)
+          .withProbes(
+            livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
+            readinessProbe = NoProbe
+          )
+          .replicas(1)
+          .addPorts(List(Port(Some("app"), 8080)))
+          .annotateSpecTemplate(Map(metadataKey -> metadataValue))
+          .env(envName, envValue)
+          .addCommand(Seq("java"))
 
-          val expectedYaml = parse(
-            s"""
+        val expectedYaml = parse(s"""
                |apiVersion: apps/v1
                |kind: Deployment
                |metadata:
@@ -104,8 +104,10 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |    spec:
                |      containers:
                |        - image: "${dockerImage}"
-               |          imagePullPolicy: Always
+               |          imagePullPolicy: IfNotPresent
                |          name: *name
+               |          command:
+               |            - java
                |          ports:
                |            - name: app
                |              containerPort: 8080
@@ -129,36 +131,36 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |            - name: "${envName}"
                |              value: "${envValue}"
                |""".stripMargin).right.get
-          if (expectedYaml != deployment.asJson) {
-            println(expectedYaml.noSpaces)
-            println(deployment.asJson.noSpaces)
-          }
-          deployment.asJson shouldBe expectedYaml
+        if (expectedYaml != deployment.asJson) {
+          println(expectedYaml.noSpaces)
+          println(deployment.asJson.noSpaces)
         }
+        deployment.asJson shouldBe expectedYaml
+      }
     }
   }
 
   "kubernetes deployment" must "report an error" in {
     implicit val arbTest = Properties.highEmptyChance
 
-    forAll {
-      deploymentParts: DeploymentTestParts =>
-        whenever(!nonEmptyParts(deploymentParts)) {
-          import deploymentParts._
-          assertThrows[IllegalArgumentException](
-            deploy.namespace(namespace)
-              .service(serviceName)
-              .withImage(dockerImage)
-              .withProbes(
-                livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
-                readinessProbe = NoProbe
-              )
-              .replicas(1)
-              .addPorts(List(Port(Some("app"), 8080)))
-              .annotateSpecTemplate(Map(metadataKey -> metadataValue))
-              .env(envName, envValue)
-          )
-        }
+    forAll { deploymentParts: DeploymentTestParts =>
+      whenever(!nonEmptyParts(deploymentParts)) {
+        import deploymentParts._
+        assertThrows[IllegalArgumentException](
+          deploy
+            .namespace(namespace)
+            .service(serviceName)
+            .withImage(dockerImage)
+            .withProbes(
+              livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
+              readinessProbe = NoProbe
+            )
+            .replicas(1)
+            .addPorts(List(Port(Some("app"), 8080)))
+            .annotateSpecTemplate(Map(metadataKey -> metadataValue))
+            .env(envName, envValue)
+        )
+      }
     }
   }
 
@@ -216,11 +218,16 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
 }
 
 object KubernetesStateYamlSpec {
-  case class DeploymentTestParts(serviceName: String, namespace: String,
-                                 metadataKey: String, metadataValue: String,
-                                 dockerImage: String, envName: String, envValue: String)
+  case class DeploymentTestParts(serviceName: String,
+                                 namespace: String,
+                                 metadataKey: String,
+                                 metadataValue: String,
+                                 dockerImage: String,
+                                 envName: String,
+                                 envValue: String)
 
-  private def strOrEmpty: Gen[String] = Gen.oneOf(Gen.const(""), Gen.alphaNumStr)
+  private def strOrEmpty: Gen[String] =
+    Gen.oneOf(Gen.const(""), Gen.alphaNumStr)
 
   def nonEmptyParts(deploymentTestParts: DeploymentTestParts) = {
     import deploymentTestParts._
@@ -228,6 +235,7 @@ object KubernetesStateYamlSpec {
   }
 
   object Properties {
+
     val highEmptyChance: Arbitrary[DeploymentTestParts] = Arbitrary(
       for {
         serviceName <- strOrEmpty

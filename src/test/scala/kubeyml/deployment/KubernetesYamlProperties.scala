@@ -21,19 +21,15 @@
 
 package kubeyml.deployment
 
+import io.circe.syntax._
 import io.circe.yaml.parser.parse
 import kubeyml.deployment.KubernetesComponents._
 import kubeyml.deployment.api._
-import org.scalacheck.Properties
-import org.scalacheck._
-import io.circe.Json
-import io.circe.syntax._
-import io.circe.yaml.parser._
-import io.circe.generic.auto._
-import kubeyml.deployment.api._
 import kubeyml.deployment.json_support._
-import scala.util.{Failure, Try}
+import org.scalacheck.{Properties, _}
+
 import scala.concurrent.duration._
+import scala.util.{Failure, Try}
 
 class KubernetesYamlProperties extends Properties("yaml"){
 
@@ -60,30 +56,33 @@ class KubernetesYamlProperties extends Properties("yaml"){
     }
   }
 
-  property("environmentvars") = Prop.forAll(environmentVariableTestPartsGen) { environmentVariableTestParts =>
-    import environmentVariableTestParts._
-    val envYaml = parse(
-      s"""
-            - name: ${fieldPathName.value}
+  propertyWithSeed("environmentvars", Some("MlTkQzNFX15MNwakjSMthNAkGpZfJ3SP7_iLmejBIKK=")) = {
+    Prop.forAll(environmentVariableTestPartsGen) { environmentVariableTestParts =>
+      import environmentVariableTestParts._
+      val envYaml = parse(
+        s"""
+            - name: "${fieldPathName.value}"
               valueFrom:
                 fieldRef:
-                  fieldPath: ${fieldPathValue.value}
-            - name: ${secretEnvName.value}
+                  fieldPath: "${fieldPathValue.value}"
+            - name: "${secretEnvName.value}"
               valueFrom:
                 secretKeyRef:
-                  key: ${secretKey.value}
-                  name: ${secretName.value}
-            - name: ${rawName.value}
+                  key: "${secretKey.value}"
+                  name: "${secretName.value}"
+            - name: "${rawName.value}"
               value: "${rawValue}"
         """
-    )
-    val actualJson = Map[EnvName, EnvValue](
-      EnvName(fieldPathName) -> EnvFieldValue(fieldPathValue),
-      EnvName(secretEnvName) -> EnvSecretValue(secretName, secretKey),
-      EnvName(rawName) -> EnvRawValue(rawValue)
-    ).asJson
+      )
 
-    Right(actualJson) == envYaml
+      val actualJson = Map[EnvName, EnvValue](
+        EnvName(fieldPathName) -> EnvFieldValue(fieldPathValue),
+        EnvName(secretEnvName) -> EnvSecretValue(secretName, secretKey),
+        EnvName(rawName) -> EnvRawValue(rawValue)
+      ).asJson
+
+      Right(actualJson) == envYaml
+    }
 
   }
 }

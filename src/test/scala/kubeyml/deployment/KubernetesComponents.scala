@@ -22,6 +22,8 @@
 package kubeyml.deployment
 
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.ScalacheckShapeless._
+
 trait KubernetesComponents {
 
   private def strOrEmpty: Gen[String] = Gen.oneOf(Gen.const(""), Gen.alphaNumStr)
@@ -55,23 +57,12 @@ trait KubernetesComponents {
     } yield DeploymentTestParts(serviceName, namespace, metaKey, metaValue, dockerImage, envName, envValue)
 
 
-  val nonEmptyStringGen: Gen[NonEmptyString] =
-    Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString)
+  implicit val nonEmptyStringGen: Arbitrary[NonEmptyString] =
+    Arbitrary(Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString))
 
   val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] = {
-    val testParts = for {
-      fieldPathName <- nonEmptyStringGen
-      fieldPathValue <- nonEmptyStringGen
-      secretEnvName <- nonEmptyStringGen
-      secretKey <- nonEmptyStringGen
-      secretName <- nonEmptyStringGen
-      rawName <- nonEmptyStringGen
-      rawValue <- strOrEmpty
-      envs = EnvironmentVariableTestParts(
-        fieldPathName, fieldPathValue, secretEnvName, secretKey, secretName, rawName, rawValue
-      )
-    } yield envs
-    testParts
+    implicit val arbitraryString: Arbitrary[String] = Arbitrary(Gen.alphaNumStr)
+    implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
   }
 
 }

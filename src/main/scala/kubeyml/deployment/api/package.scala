@@ -94,5 +94,7 @@ package object api {
       deployment.request(resource)
     def limitResource(resource: Resource): Deployment =
       deployment.limit(resource)
+    def pullDockerImage(pullPolicy: ImagePullPolicy): Deployment =
+      deployment.pullPolicy(pullPolicy)
   }
 }

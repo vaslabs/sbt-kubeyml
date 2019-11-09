@@ -20,7 +20,7 @@
  */
 
 package kubeyml.deployment.plugin
-import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, Port, Probe, Resource, Resources}
+import kubeyml.deployment.{Always, Deployment, EnvName, EnvValue, HttpGet, HttpProbe, ImagePullPolicy, Port, Probe, Resource, Resources}
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
@@ -42,9 +42,14 @@ trait Keys {
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
 
+  val imagePullPolicy = settingKey[ImagePullPolicy]("Pull policy of docker image")
+
+  val deployment = settingKey[Deployment]("The kubernetes deployment description")
+
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
 
   val kube = Configuration.of("KubeDeployment", "kubeyml")
+
 }
 
 object Keys extends Keys {
@@ -52,21 +57,7 @@ object Keys extends Keys {
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := {
       Plugin.generate(
-        deploy.namespace(
-          (namespace in kube).value
-        ).service(
-          (application in kube).value
-        ).withImage(
-          (dockerImage in kube).value
-        ).withProbes(
-          (livenessProbe in kube).value,
-          (readinessProbe in kube).value
-        ).addContainerPorts((ports in kube).value)
-          .annotateSpecTemplate((annotations in kube).value)
-          .replicas((replicas in kube).value)
-          .addEnv((envs in kube).value)
-          .requestResource((resourceRequests in kube).value)
-          .limit((resourceLimits in kube).value),
+        (deployment in kube).value,
         (target in ThisProject).value
       )
     },
@@ -82,6 +73,25 @@ object Keys extends Keys {
     replicas := 2,
     envs := Map.empty,
     resourceRequests := Resources().requests,
-    resourceLimits := Resources().limits
+    resourceLimits := Resources().limits,
+    imagePullPolicy := Always,
+    deployment :=
+      deploy
+        .namespace(kubeSetting(namespace).value)
+        .service(kubeSetting(application).value)
+        .withImage(kubeSetting(dockerImage).value)
+        .withProbes(
+          kubeSetting(livenessProbe).value,
+          kubeSetting(readinessProbe).value
+        ).addContainerPorts(kubeSetting(ports).value)
+        .annotateSpecTemplate(kubeSetting(annotations).value)
+        .replicas(kubeSetting(replicas).value)
+        .addEnv(kubeSetting(envs).value)
+        .requestResource(kubeSetting(resourceRequests).value)
+        .limit(kubeSetting(resourceLimits).value)
+        .pullPolicy(kubeSetting(imagePullPolicy).value)
+
   )
+
+  private def kubeSetting[A](setting: SettingKey[A]): SettingKey[A] = (setting in kube)
 }

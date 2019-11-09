@@ -30,6 +30,7 @@ case class Deployment(
   metadata: DeploymentMetadata,
   spec: Spec
 ) extends KubernetesState {
+
   private[kubeyml] def addContainerPorts(ports: List[Port]): Deployment =
     this.copy(spec = spec.addContainerPorts(ports))
   private[kubeyml] def annotateSpecTemplate(annotations: Map[String, String]): Deployment =
@@ -45,6 +46,9 @@ case class Deployment(
 
   private[kubeyml] def pullPolicy(pullPolicy: ImagePullPolicy): Deployment =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
+  private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
+    this.copy(spec = spec.withUpdateStrategy(rollingUpdate))
+
 }
 
 case class DeploymentMetadata(
@@ -77,6 +81,9 @@ case class Spec(
 
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Spec =
     this.copy(template = template.withContainerPullPolicy(pullPolicy))
+
+  private[deployment] def withUpdateStrategy(rollingUpdate: RollingUpdate): Spec =
+    this.copy(strategy = rollingUpdate)
 
 }
 
@@ -116,6 +123,7 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Template =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
+
 
 }
 

@@ -21,6 +21,8 @@
 
 package kubeyml.deployment
 
+import KubernetesComponents._
+
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -32,8 +34,8 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
 
+
 class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks{
-  import KubernetesComponents._
 
 
   "deployment strategy" must "have the correct schema" in {

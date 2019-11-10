@@ -20,7 +20,10 @@
  */
 
 package kubeyml.deployment.plugin
-import kubeyml.deployment.{Always, Deployment, EnvName, EnvValue, HttpGet, HttpProbe, ImagePullPolicy, Port, Probe, Resource, Resources}
+
+import kubeyml.deployment._
+import kubeyml.deployment.api._
+
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
@@ -53,7 +56,6 @@ trait Keys {
 }
 
 object Keys extends Keys {
-  import kubeyml.deployment.api._
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := {
       Plugin.generate(

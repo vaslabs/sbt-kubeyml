@@ -130,12 +130,10 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
                |          env:
                |            - name: "${envName}"
                |              value: "${envValue}"
-               |""".stripMargin).right.get
-          if (expectedYaml != deployment.asJson) {
-            println(expectedYaml.noSpaces)
-            println(deployment.asJson.noSpaces)
-          }
-          deployment.asJson shouldBe expectedYaml
+               |""".stripMargin)
+          val actualJson = Right(deployment.asJson)
+
+          actualJson shouldBe expectedYaml
         }
     }
   }
@@ -143,7 +141,11 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
   "cpu and memory" must "be encoded as strings with m and MiB indicators" in {
     Cpu(500).asJson shouldBe "500m".asJson
     Memory(128).asJson shouldBe "128Mi".asJson
-    Resources(Resource(Cpu(500), Memory(128)), Resource(Cpu(1000), Memory(512))).asJson shouldBe parse(
+
+    val actualResourcesJson = Right(
+      Resources(Resource(Cpu(500), Memory(128)), Resource(Cpu(1000), Memory(512))).asJson
+    )
+    val expectedResourcesJson = parse(
       """
           requests:
             memory: "128Mi"
@@ -152,7 +154,9 @@ class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckProp
             memory: "512Mi"
             cpu: "1000m"
         """
-    ).right.get
+    )
+
+    actualResourcesJson shouldBe expectedResourcesJson
   }
 
 }

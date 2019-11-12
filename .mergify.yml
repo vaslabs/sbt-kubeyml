@@ -3,6 +3,7 @@ pull_request_rules:
     conditions:
         - "status-success=ci/circleci: validate"
         - "#approved-reviews-by>=1"
+        - "status-success=Codacy/PR Quality Review"
     actions:
       merge:
         method: merge

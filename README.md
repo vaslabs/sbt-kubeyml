@@ -48,7 +48,7 @@ kubeyml:gen
 ### Single namespace, two types of deployments with secret and dependency
 
 ```scala
-import kubeyml.deployment.{Cpu, EnvName, EnvRawValue, EnvSecretValue, Memory, Resource}
+import kubeyml.deployment._
 import kubeyml.deployment.api._
 import kubeyml.deployment.plugin.Keys._
 
@@ -65,7 +65,9 @@ lazy val deploymentSettings = Seq(
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
   resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests in kube := Resource(Cpu(500), Memory(512))
+  resourceRequests in kube := Resource(Cpu(500), Memory(512)),
+  //if you want you can use something like the below to modify any part of the deployment by hand
+  deployment in kube := (deployment in kube).value.pullDockerImage(IfNotPresent)
 )
 ```
 

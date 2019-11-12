@@ -37,17 +37,19 @@ kubeyml:gen
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
+| imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | Always |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
 | resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(500), Memory(256))` |
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
 | target | The directory to output the deployment.yml | target of this project |
+| deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
 
 ## Recipes
 
 ### Single namespace, two types of deployments with secret and dependency
 
 ```scala
-import kubeyml.deployment.{Cpu, EnvName, EnvRawValue, EnvSecretValue, Memory, Resource}
+import kubeyml.deployment._
 import kubeyml.deployment.api._
 import kubeyml.deployment.plugin.Keys._
 
@@ -64,7 +66,9 @@ lazy val deploymentSettings = Seq(
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
   resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests in kube := Resource(Cpu(500), Memory(512))
+  resourceRequests in kube := Resource(Cpu(500), Memory(512)),
+  //if you want you can use something like the below to modify any part of the deployment by hand
+  deployment in kube := (deployment in kube).value.pullDockerImage(IfNotPresent)
 )
 ```
 

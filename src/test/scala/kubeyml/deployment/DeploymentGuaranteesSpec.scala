@@ -21,8 +21,8 @@
 
 package kubeyml.deployment
 
-import org.scalatest.{FlatSpec, Matchers, WordSpec}
-import api._
+import kubeyml.deployment.api._
+import org.scalatest.{Matchers, WordSpec}
 
 class DeploymentGuaranteesSpec extends WordSpec with Matchers{
 
@@ -30,6 +30,16 @@ class DeploymentGuaranteesSpec extends WordSpec with Matchers{
     "not accept empty docker images" in {
       assertThrows[IllegalArgumentException](
         deploy.namespace("namespace").service("application").withImage("")
+      )
+    }
+    "not accept empty namespace" in {
+      assertThrows[IllegalArgumentException](
+        deploy.namespace("").service("application").withImage("image")
+      )
+    }
+    "not accept empty service" in {
+      assertThrows[IllegalArgumentException](
+        deploy.namespace("namespace").service("").withImage("image")
       )
     }
   }

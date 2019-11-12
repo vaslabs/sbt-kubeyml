@@ -30,6 +30,7 @@ case class Deployment(
   metadata: DeploymentMetadata,
   spec: Spec
 ) extends KubernetesState {
+
   private[kubeyml] def addContainerPorts(ports: List[Port]): Deployment =
     this.copy(spec = spec.addContainerPorts(ports))
   private[kubeyml] def annotateSpecTemplate(annotations: Map[String, String]): Deployment =
@@ -42,6 +43,12 @@ case class Deployment(
 
   private[kubeyml] def limit(resource: Resource): Deployment =
     this.copy(spec = spec.limitResource(resource))
+
+  private[kubeyml] def pullPolicy(pullPolicy: ImagePullPolicy): Deployment =
+    this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
+  private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
+    this.copy(spec = spec.withUpdateStrategy(rollingUpdate))
+
 }
 
 case class DeploymentMetadata(
@@ -58,6 +65,7 @@ case class Spec(
   template: Template,
   strategy: DeploymentStrategy
 ) {
+
   private[deployment] def addContainerPorts(ports: List[Port]): Spec =
     this.copy(template = template.addContainerPorts(ports))
   private[deployment] def annotate(annotations: Map[String, String]): Spec =
@@ -70,6 +78,13 @@ case class Spec(
 
   private[deployment] def limitResource(resource: Resource): Spec =
     this.copy(template = template.limitResource(resource))
+
+  private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Spec =
+    this.copy(template = template.withContainerPullPolicy(pullPolicy))
+
+  private[deployment] def withUpdateStrategy(rollingUpdate: RollingUpdate): Spec =
+    this.copy(strategy = rollingUpdate)
+
 }
 
 case class Selector(
@@ -86,6 +101,7 @@ object MatchLabels {
 }
 
 case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
+
   private[deployment] def addContainerPorts(ports: List[Port]): Template =
     this.copy(spec = spec.addContainerPorts(ports))
 
@@ -104,11 +120,17 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
   private[deployment] def limitResource(resource: Resource): Template =
     this.copy(spec = spec.limitResource(resource))
+
+  private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Template =
+    this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
+
+
 }
 
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
 
 case class TemplateSpec(containers: List[Container]) {
+
   private[deployment] def addContainerPorts(ports: List[Port]): TemplateSpec =
     this.copy(containers = containers.map {
       container => container.copy(ports = container.ports ++ ports)
@@ -121,6 +143,10 @@ case class TemplateSpec(containers: List[Container]) {
 
   private[deployment] def limitResource(resource: Resource): TemplateSpec =
     this.copy(containers = containers.map(_.limitResource(resource)))
+
+  private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): TemplateSpec =
+    this.copy(containers = containers.map(_.withPullPolicy(pullPolicy)))
+
 }
 
 case class Container(
@@ -133,6 +159,7 @@ case class Container(
     env: Map[EnvName, EnvValue],
     resources: Resources = Resources()
 ) {
+
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
 
@@ -140,6 +167,9 @@ case class Container(
     this.copy(resources = resources.copy(requests = resource))
   private[deployment] def limitResource(resource: Resource): Container =
     this.copy(resources = resources.copy(limits = resource))
+
+  def withPullPolicy(pullPolicy: ImagePullPolicy): Container =
+    this.copy(imagePullPolicy = pullPolicy)
 }
 
 case class Resources(

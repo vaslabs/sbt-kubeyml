@@ -26,5 +26,7 @@ object EmptyDeployment extends EmptyDeployment
 case class NamespaceDeployment(namespace: String)
 case class AppDeployment(namespace: String, service: String)
 case class DockerisedAppDeployment(namespace: String, service: String, image: String) {
-  require(image.length > 0)
+  require(image.nonEmpty, "Image must not be empty")
+  require(namespace.nonEmpty, "Namespace must not be empty")
+  require(service.nonEmpty, "Namespace must not be empty")
 }

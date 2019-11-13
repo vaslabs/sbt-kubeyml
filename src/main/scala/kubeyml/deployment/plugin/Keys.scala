@@ -20,16 +20,17 @@
  */
 
 package kubeyml.deployment.plugin
-import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, NonEmptyString, Port, Probe, Resource, Resources}
+
+import kubeyml.deployment._
+import kubeyml.deployment.api._
+
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
 
 trait Keys {
   val dockerImage = settingKey[String]("The docker image to deploy")
-
-  val namespace =
-    settingKey[String]("The namespace that the application will be deployed to")
+  val namespace = settingKey[String]("The namespace that the application will be deployed to")
   val application = settingKey[String]("The application name")
 
   val livenessProbe = settingKey[Probe]("The liveness probe for healthchecks")
@@ -39,47 +40,27 @@ trait Keys {
   val replicas = settingKey[Int]("The number of replicas of the application")
   val annotations = settingKey[Map[String, String]]("Wildcard for setting annotations on the deployment spec")
 
-  val resourceLimits =
-    settingKey[Resource]("Cpu and memory limit for the container")
-
-  val resourceRequests =
-    settingKey[Resource]("Cpu and memory request, must not exceed limits")
+  val resourceLimits = settingKey[Resource]("Cpu and memory limit for the container")
+  val resourceRequests = settingKey[Resource]("Cpu and memory request, must not exceed limits")
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
   val command = settingKey[NonEmptyString]("Command for the container")
   val args = settingKey[Seq[String]]("arguments for the container")
 
+  val imagePullPolicy = settingKey[ImagePullPolicy]("Pull policy of docker image")
+  val deployment = settingKey[Deployment]("The kubernetes deployment description")
+
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
 
   val kube = Configuration.of("KubeDeployment", "kubeyml")
+
 }
 
 object Keys extends Keys {
-  import kubeyml.deployment.api._
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := {
       Plugin.generate(
-        deploy
-          .namespace(
-            (namespace in kube).value
-          )
-          .service(
-            (application in kube).value
-          )
-          .withImage(
-            (dockerImage in kube).value
-          )
-          .withProbes(
-            (livenessProbe in kube).value,
-            (readinessProbe in kube).value
-          )
-          .addContainerPorts((ports in kube).value)
-          .annotateSpecTemplate((annotations in kube).value)
-          .replicas((replicas in kube).value)
-          .addCommand(Some((command in kube).value), (args in kube).value)
-          .addEnv((envs in kube).value)
-          .requestResource((resourceRequests in kube).value)
-          .limit((resourceLimits in kube).value),
+        (deployment in kube).value,
         (target in ThisProject).value
       )
     },
@@ -95,6 +76,26 @@ object Keys extends Keys {
     replicas := 2,
     envs := Map.empty,
     resourceRequests := Resources().requests,
-    resourceLimits := Resources().limits
+    resourceLimits := Resources().limits,
+    imagePullPolicy := Always,
+    deployment :=
+      deploy
+        .namespace(kubeSetting(namespace).value)
+        .service(kubeSetting(application).value)
+        .withImage(kubeSetting(dockerImage).value)
+        .withProbes(
+          kubeSetting(livenessProbe).value,
+          kubeSetting(readinessProbe).value
+        )
+        .addContainerPorts(kubeSetting(ports).value)
+        .annotateSpecTemplate(kubeSetting(annotations).value)
+        .addCommand(Some(kubeSetting(command).value), kubeSetting(args).value)
+        .replicas(kubeSetting(replicas).value)
+        .addEnv(kubeSetting(envs).value)
+        .requestResource(kubeSetting(resourceRequests).value)
+        .limit(kubeSetting(resourceLimits).value)
+        .pullPolicy(kubeSetting(imagePullPolicy).value)
   )
+
+  private def kubeSetting[A](setting: SettingKey[A]): SettingKey[A] = (setting in kube)
 }

@@ -63,6 +63,10 @@ trait KubernetesComponents {
   val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] = {
     implicit val arbitraryString: Arbitrary[String] = Arbitrary(Gen.alphaNumStr)
     implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
+  }.filterNot {
+    case EnvironmentVariableTestParts(fieldPathName, _, secretEnvName, _, _, rawName, _) =>
+      Seq(fieldPathName == secretEnvName, fieldPathName == rawName, secretEnvName == rawName)
+        .fold(false)(_ || _)
   }
 
 }

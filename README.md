@@ -1,11 +1,12 @@
-# sbt-kubeyml [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1a2b9682f101488cb8bf5589e5bd7310)](https://www.codacy.com/manual/vaslabs/sbt-kubeyml?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vaslabs/sbt-kubeyml&amp;utm_campaign=Badge_Grade) [![CircleCI](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg)](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml)
+# sbt-kubeyml [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1a2b9682f101488cb8bf5589e5bd7310)](https://www.codacy.com/manual/vaslabs/sbt-kubeyml?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vaslabs/sbt-kubeyml&amp;utm_campaign=Badge_Grade) [![CircleCI](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg)](https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml) [![Scala Steward badge](https://img.shields.io/badge/Scala_Steward-helping-blue.svg?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAMAAAARSr4IAAAAVFBMVEUAAACHjojlOy5NWlrKzcYRKjGFjIbp293YycuLa3pYY2LSqql4f3pCUFTgSjNodYRmcXUsPD/NTTbjRS+2jomhgnzNc223cGvZS0HaSD0XLjbaSjElhIr+AAAAAXRSTlMAQObYZgAAAHlJREFUCNdNyosOwyAIhWHAQS1Vt7a77/3fcxxdmv0xwmckutAR1nkm4ggbyEcg/wWmlGLDAA3oL50xi6fk5ffZ3E2E3QfZDCcCN2YtbEWZt+Drc6u6rlqv7Uk0LdKqqr5rk2UCRXOk0vmQKGfc94nOJyQjouF9H/wCc9gECEYfONoAAAAASUVORK5CYII=)](https://scala-steward.org)
+
 An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
 
 ## Usage
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.2")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.3")
 ```
 
 Add the plugin in your project and enable it
@@ -26,7 +27,7 @@ kubeyml:gen
 
 ## Properties
 
-| sbt key  | description  | default  | 
+| **sbt key**  | **description**  | **default**  | 
 |---|---|---|
 | namespace  | The kubernetes namespace of the deployment   |  Default value is project name | 
 |  application | The name of the deployment  |  Default value is project name  |
@@ -36,17 +37,21 @@ kubeyml:gen
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
+| imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | Always |
+| command | Command for the container | empty |
+| args | arguments for the command | empty Seq |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
 | resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(500), Memory(256))` |
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
 | target | The directory to output the deployment.yml | target of this project |
+| deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
 
 ## Recipes
 
 ### Single namespace, two types of deployments with secret and dependency
 
 ```scala
-import kubeyml.deployment.{Cpu, EnvName, EnvRawValue, EnvSecretValue, Memory, Resource}
+import kubeyml.deployment._
 import kubeyml.deployment.api._
 import kubeyml.deployment.plugin.Keys._
 
@@ -57,13 +62,17 @@ lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https
 lazy val deploymentSettings = Seq(
   namespace in kube := "my-namespace", //default is name in thisProject
   application in kube := deploymentName, //default is name in thisProject
+  command in kube := "webserver",
+  args in kube := Seq("-c","/path/to/config"),
   envs in kube := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
   resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests in kube := Resource(Cpu(500), Memory(512))
+  resourceRequests in kube := Resource(Cpu(500), Memory(512)),
+  //if you want you can use something like the below to modify any part of the deployment by hand
+  deployment in kube := (deployment in kube).value.pullDockerImage(IfNotPresent)
 )
 ```
 

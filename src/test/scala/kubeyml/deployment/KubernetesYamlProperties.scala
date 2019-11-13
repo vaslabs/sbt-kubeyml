@@ -74,12 +74,17 @@ class KubernetesYamlProperties extends Properties("yaml"){
       """
     )
 
-    val actualJson = Map[EnvName, EnvValue](
+    val actualJson = Right(Map[EnvName, EnvValue](
       EnvName(fieldPathName) -> EnvFieldValue(fieldPathValue),
       EnvName(secretEnvName) -> EnvSecretValue(secretName, secretKey),
       EnvName(rawName) -> EnvRawValue(rawValue)
-    ).asJson
+    ).asJson)
 
-    Right(actualJson) == envYaml
+    if (actualJson != envYaml) {
+      println(actualJson.right.get)
+      println(envYaml.right.get)
+    }
+
+    actualJson == envYaml
   }
 }

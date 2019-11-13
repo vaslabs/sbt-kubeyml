@@ -105,5 +105,9 @@ package object api {
 
     def limitResource(resource: Resource): Deployment =
       deployment.limit(resource)
+    def pullDockerImage(pullPolicy: ImagePullPolicy): Deployment =
+      deployment.pullPolicy(pullPolicy)
+    def rollingUpdate(rollingUpdate: RollingUpdate): Deployment =
+      deployment.withUpdateStrategy(rollingUpdate)
   }
 }

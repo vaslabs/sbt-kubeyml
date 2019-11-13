@@ -37,8 +37,9 @@ case class Deployment(
   private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
     this.copy(spec = spec.addContainerEnvs(envs))
 
-  private[kubeyml] def addCommand(command: Seq[String]): Deployment =
-    this.copy(spec = spec.addContainerCmd(command))
+  private[kubeyml] def addCommand(cmd: Option[NonEmptyString], args: Seq[String]): Deployment = {
+    this.copy(spec = spec.addContainerCmd(cmd, args))
+  }
 
   private[kubeyml] def request(resource: Resource): Deployment =
     this.copy(spec = spec.limitResource(resource))
@@ -67,8 +68,8 @@ case class Spec(
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
     this.copy(template = template.addContainerEnvs(envs))
 
-  private[deployment] def addContainerCmd(command: Seq[String]): Spec =
-    this.copy(template = template.addContainerCmd(command))
+  private[deployment] def addContainerCmd(command: Option[NonEmptyString], args: Seq[String]): Spec =
+    this.copy(template = template.addContainerCmd(command, args))
 
   private[deployment] def requestResource(resource: Resource): Spec =
     this.copy(template = template.requestResource(resource))
@@ -104,8 +105,8 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
     this.copy(metadata = metadata.copy(annotations = annotations))
   }
 
-  private[deployment] def addContainerCmd(command: Seq[String]): Template =
-    this.copy(spec = spec.addContainerCmd(command))
+  private[deployment] def addContainerCmd(command: Option[NonEmptyString], args: Seq[String]): Template =
+    this.copy(spec = spec.addContainerCmd(command, args))
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
     this.copy(spec = spec.addContainerEnvs(envs))
@@ -124,8 +125,8 @@ case class TemplateSpec(containers: List[Container]) {
     this.copy(containers = containers.map { container =>
       container.copy(ports = container.ports ++ ports)
     })
-  private[deployment] def addContainerCmd(command: Seq[String]): TemplateSpec =
-    this.copy(containers = containers.map(_.addCommand(command)))
+  private[deployment] def addContainerCmd(command: Option[NonEmptyString], args: Seq[String]): TemplateSpec =
+    this.copy(containers = containers.map(_.addCommand(command, args)))
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
     this.copy(containers = containers.map(_.addEnvs(envs)))
   private[deployment] def requestResource(resource: Resource): TemplateSpec =
@@ -138,7 +139,8 @@ case class TemplateSpec(containers: List[Container]) {
 case class Container(
   name: NonEmptyString,
   image: NonEmptyString,
-  command: Seq[String],
+  command: Option[Command],
+  args: Seq[String],
   ports: List[Port],
   imagePullPolicy: ImagePullPolicy,
   livenessProbe: Probe,
@@ -148,8 +150,14 @@ case class Container(
 ) {
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
-  private[deployment] def addCommand(command: Seq[String]): Container =
-    this.copy(command = command)
+  private[deployment] def addCommand(cmd: Option[NonEmptyString], args: Seq[String]): Container = {
+    val containerCmd = cmd match {
+      case Some(value) => Some(Command(value))
+      case None        => None
+    }
+    this.copy(command = containerCmd, args = args)
+  }
+
   private[deployment] def requestResource(resource: Resource): Container =
     this.copy(resources = resources.copy(requests = resource))
   private[deployment] def limitResource(resource: Resource): Container =
@@ -201,6 +209,8 @@ case class HttpProbe(httpGet: HttpGet,
 case object NoProbe extends Probe
 
 case class HttpGet(path: NonEmptyString, port: Int, httpHeaders: List[Header])
+
+case class Command(cmd: NonEmptyString)
 
 case class Header(name: NonEmptyString, value: NonEmptyString)
 

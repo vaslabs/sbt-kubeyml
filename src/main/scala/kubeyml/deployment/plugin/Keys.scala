@@ -20,7 +20,7 @@
  */
 
 package kubeyml.deployment.plugin
-import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, Port, Probe, Resource, Resources}
+import kubeyml.deployment.{EnvName, EnvValue, HttpGet, HttpProbe, NonEmptyString, Port, Probe, Resource, Resources}
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
@@ -46,7 +46,8 @@ trait Keys {
     settingKey[Resource]("Cpu and memory request, must not exceed limits")
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
-  val containerCmd = settingKey[Seq[String]]("Command for the container")
+  val command = settingKey[NonEmptyString]("Command for the container")
+  val args = settingKey[Seq[String]]("arguments for the container")
 
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
 
@@ -75,7 +76,7 @@ object Keys extends Keys {
           .addContainerPorts((ports in kube).value)
           .annotateSpecTemplate((annotations in kube).value)
           .replicas((replicas in kube).value)
-          .addCommand((containerCmd in kube).value)
+          .addCommand(Some((command in kube).value), (args in kube).value)
           .addEnv((envs in kube).value)
           .requestResource((resourceRequests in kube).value)
           .limit((resourceLimits in kube).value),
@@ -92,7 +93,6 @@ object Keys extends Keys {
     readinessProbe := (livenessProbe in kube).value,
     annotations := Map.empty,
     replicas := 2,
-    containerCmd := Seq.empty[String],
     envs := Map.empty,
     resourceRequests := Resources().requests,
     resourceLimits := Resources().limits

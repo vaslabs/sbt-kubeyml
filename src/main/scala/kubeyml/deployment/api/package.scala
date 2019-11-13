@@ -64,7 +64,8 @@ package object api {
               Container(
                 service,
                 image,
-                List.empty,
+                None,
+                Seq.empty,
                 List.empty,
                 IfNotPresent,
                 livenessProbe,

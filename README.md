@@ -27,7 +27,7 @@ kubeyml:gen
 
 ## Properties
 
-| sbt key  | description  | default  | 
+| **sbt key**  | **description**  | **default**  | 
 |---|---|---|
 | namespace  | The kubernetes namespace of the deployment   |  Default value is project name | 
 |  application | The name of the deployment  |  Default value is project name  |
@@ -38,6 +38,8 @@ kubeyml:gen
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
 | imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | Always |
+| command | Command for the container | empty |
+| args | arguments for the command | empty Seq |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
 | resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(500), Memory(256))` |
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
@@ -60,6 +62,8 @@ lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https
 lazy val deploymentSettings = Seq(
   namespace in kube := "my-namespace", //default is name in thisProject
   application in kube := deploymentName, //default is name in thisProject
+  command in kube := "webserver",
+  args in kube := Seq("-c","/path/to/config"),
   envs in kube := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),

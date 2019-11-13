@@ -29,33 +29,35 @@ object json_support {
   import io.circe.generic.semiauto._
   import io.circe.syntax._
 
-  implicit val rollingUpdateEncoder: Encoder[RollingUpdate] = deriveEncoder[RollingUpdate].mapJson {
-    json =>
-      Json.obj(
-        "type" -> "RollingUpdate".asJson,
-        "rollingUpdate" -> json
-      )
+  implicit val rollingUpdateEncoder: Encoder[RollingUpdate] = deriveEncoder[RollingUpdate].mapJson { json =>
+    Json.obj(
+      "type" -> "RollingUpdate".asJson,
+      "rollingUpdate" -> json
+    )
   }
 
   private def removeNulls[A](encoder: Encoder.AsObject[A]) =
     encoder.mapJsonObject(_.filter { case (_, v) => !v.isNull && v.asArray.map(_.size > 0).getOrElse(true) })
 
   implicit val deploymentStrategyEncoder: Encoder[DeploymentStrategy] = Encoder.instance {
-      case r: RollingUpdate => rollingUpdateEncoder.apply(r)
-    }
+    case r: RollingUpdate => rollingUpdateEncoder.apply(r)
+  }
 
-
+  implicit val containerCmdEncoder: Encoder[Command] = Encoder.instance {
+    case Command(cmd) => Seq(cmd).asJson
+  }
 
   implicit val imagePullPolicyEncoder: Encoder[ImagePullPolicy] = Encoder.instance {
-    case Always => "Always".asJson
+    case Always       => "Always".asJson
     case IfNotPresent => "IfNotPresent".asJson
   }
 
   implicit val httpGetEncoder: Encoder[HttpGet] = removeNulls(deriveEncoder)
 
-  implicit val httpProbeEncoder: Encoder[HttpProbe] = Encoder.instance[HttpProbe] {
-    httpProbe => {
-      val fields: List[(String, Json)] = List("httpGet" -> httpProbe.httpGet.asJson,
+  implicit val httpProbeEncoder: Encoder[HttpProbe] = Encoder.instance[HttpProbe] { httpProbe =>
+    {
+      val fields: List[(String, Json)] = List(
+        "httpGet" -> httpProbe.httpGet.asJson,
         "initialDelaySeconds" -> httpProbe.initialDelay.toSeconds.asJson,
         "periodSeconds" -> httpProbe.period.toSeconds.asJson,
         "timeoutSeconds" -> httpProbe.timeout.toSeconds.asJson,
@@ -76,7 +78,7 @@ object json_support {
 
   implicit val probeEncoder: Encoder[Probe] = Encoder.instance {
     case h: HttpProbe => httpProbeEncoder(h)
-    case NoProbe => Json.Null
+    case NoProbe      => Json.Null
   }
 
   implicit val containerEncoder: Encoder[Container] = removeNulls(deriveEncoder[Container])
@@ -110,19 +112,20 @@ object json_support {
   private val envRawValueEncoder: Encoder[EnvRawValue] = Encoder.encodeString.contramap(_.value)
 
   implicit val envValueEncoder: Encoder[EnvValue] = Encoder.instance {
-    case raw: EnvRawValue => envRawValueEncoder(raw)
-    case secret: EnvSecretValue => envSecretValueEncoder(secret)
+    case raw: EnvRawValue         => envRawValueEncoder(raw)
+    case secret: EnvSecretValue   => envSecretValueEncoder(secret)
     case fieldPath: EnvFieldValue => envFieldValueEncoder(fieldPath)
   }
 
   implicit val envVarDefinitionEncoder: Encoder[EnvVarDefinition] = Encoder.instance { envVarDefinition =>
     Json.obj(
       "name" -> envVarDefinition.name.asJson,
-             keyValue(envVarDefinition.value) -> envVarDefinition.value.asJson
+      keyValue(envVarDefinition.value) -> envVarDefinition.value.asJson
     )
   }
 
-  implicit val environmentVariablesEncoder: Encoder[Map[EnvName, EnvValue]] = Encoder.encodeList[EnvVarDefinition]
+  implicit val environmentVariablesEncoder: Encoder[Map[EnvName, EnvValue]] = Encoder
+    .encodeList[EnvVarDefinition]
     .contramap(_.toList.map {
       case (name, value) => EnvVarDefinition(name.value, value)
     })

@@ -44,9 +44,10 @@ trait Keys {
   val resourceRequests = settingKey[Resource]("Cpu and memory request, must not exceed limits")
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
+  val command = settingKey[NonEmptyString]("Command for the container")
+  val args = settingKey[Seq[String]]("arguments for the container")
 
   val imagePullPolicy = settingKey[ImagePullPolicy]("Pull policy of docker image")
-
   val deployment = settingKey[Deployment]("The kubernetes deployment description")
 
   val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
@@ -85,14 +86,15 @@ object Keys extends Keys {
         .withProbes(
           kubeSetting(livenessProbe).value,
           kubeSetting(readinessProbe).value
-        ).addContainerPorts(kubeSetting(ports).value)
+        )
+        .addContainerPorts(kubeSetting(ports).value)
         .annotateSpecTemplate(kubeSetting(annotations).value)
+        .addCommand(Some(kubeSetting(command).value), kubeSetting(args).value)
         .replicas(kubeSetting(replicas).value)
         .addEnv(kubeSetting(envs).value)
         .requestResource(kubeSetting(resourceRequests).value)
         .limit(kubeSetting(resourceLimits).value)
         .pullPolicy(kubeSetting(imagePullPolicy).value)
-
   )
 
   private def kubeSetting[A](setting: SettingKey[A]): SettingKey[A] = (setting in kube)

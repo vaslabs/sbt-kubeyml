@@ -62,7 +62,7 @@ lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https
 lazy val deploymentSettings = Seq(
   namespace in kube := "my-namespace", //default is name in thisProject
   application in kube := deploymentName, //default is name in thisProject
-  command in kube := "webserver",
+  command in kube := Some("webserver"),
   args in kube := Seq("-c","/path/to/config"),
   envs in kube := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),

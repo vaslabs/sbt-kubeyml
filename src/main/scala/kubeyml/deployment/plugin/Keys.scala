@@ -44,7 +44,7 @@ trait Keys {
   val resourceRequests = settingKey[Resource]("Cpu and memory request, must not exceed limits")
 
   val envs = settingKey[Map[EnvName, EnvValue]]("Environment variables for the container")
-  val command = settingKey[NonEmptyString]("Command for the container")
+  val command = settingKey[Option[NonEmptyString]]("Command for the container")
   val args = settingKey[Seq[String]]("arguments for the container")
 
   val imagePullPolicy = settingKey[ImagePullPolicy]("Pull policy of docker image")
@@ -77,6 +77,8 @@ object Keys extends Keys {
     envs := Map.empty,
     resourceRequests := Resources().requests,
     resourceLimits := Resources().limits,
+    command := None,
+    args := Seq.empty,
     imagePullPolicy := Always,
     deployment :=
       deploy
@@ -89,7 +91,7 @@ object Keys extends Keys {
         )
         .addContainerPorts(kubeSetting(ports).value)
         .annotateSpecTemplate(kubeSetting(annotations).value)
-        .addCommand(Some(kubeSetting(command).value), kubeSetting(args).value)
+        .addCommand(kubeSetting(command).value, kubeSetting(args).value)
         .replicas(kubeSetting(replicas).value)
         .addEnv(kubeSetting(envs).value)
         .requestResource(kubeSetting(resourceRequests).value)

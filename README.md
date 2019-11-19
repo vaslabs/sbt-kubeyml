@@ -37,7 +37,7 @@ kubeyml:gen
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
-| imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | Always |
+| imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | IfNotPresent |
 | command | Command for the container | empty |
 | args | arguments for the command | empty Seq |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |

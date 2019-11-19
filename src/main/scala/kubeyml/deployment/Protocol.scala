@@ -48,6 +48,9 @@ case class Deployment(
   private[kubeyml] def limit(resource: Resource): Deployment =
     this.copy(spec = spec.limitResource(resource))
 
+  private[kubeyml] def resources(limits: Resource, requests: Resource) =
+    this.copy(spec = spec.resources(limits, requests))
+
   private[kubeyml] def pullPolicy(pullPolicy: ImagePullPolicy): Deployment =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
   private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
@@ -69,6 +72,7 @@ case class Spec(
   strategy: DeploymentStrategy
 ) {
 
+
   private[deployment] def addContainerPorts(ports: List[Port]): Spec =
     this.copy(template = template.addContainerPorts(ports))
   private[deployment] def annotate(annotations: Map[String, String]): Spec =
@@ -84,6 +88,9 @@ case class Spec(
 
   private[deployment] def limitResource(resource: Resource): Spec =
     this.copy(template = template.limitResource(resource))
+
+  private[deployment] def resources(limits: Resource, requests: Resource): Spec =
+    this.copy(template = template.resources(limits, requests))
 
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Spec =
     this.copy(template = template.withContainerPullPolicy(pullPolicy))
@@ -132,6 +139,9 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
   private[deployment] def limitResource(resource: Resource): Template =
     this.copy(spec = spec.limitResource(resource))
 
+  private[deployment] def resources(limits: Resource, requests: Resource): Template =
+    this.copy(spec = spec.resources(limits, requests))
+
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Template =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
 
@@ -156,6 +166,9 @@ case class TemplateSpec(containers: List[Container]) {
   private[deployment] def limitResource(resource: Resource): TemplateSpec =
     this.copy(containers = containers.map(_.limitResource(resource)))
 
+  private[deployment] def resources(limits: Resource, requests: Resource): TemplateSpec =
+    this.copy(containers = containers.map(_.withResources(limits, requests)))
+
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): TemplateSpec =
     this.copy(containers = containers.map(_.withPullPolicy(pullPolicy)))
 
@@ -177,10 +190,7 @@ case class Container(
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
   private[deployment] def addCommand(cmd: Option[NonEmptyString], args: Seq[String]): Container = {
-    val containerCmd = cmd match {
-      case Some(value) => Some(Command(value))
-      case None        => None
-    }
+    val containerCmd = cmd.map(Command)
     this.copy(command = containerCmd, args = args)
   }
 
@@ -189,8 +199,12 @@ case class Container(
   private[deployment] def limitResource(resource: Resource): Container =
     this.copy(resources = resources.copy(limits = resource))
 
-  def withPullPolicy(pullPolicy: ImagePullPolicy): Container =
+  private[deployment] def withPullPolicy(pullPolicy: ImagePullPolicy): Container =
     this.copy(imagePullPolicy = pullPolicy)
+
+  private[deployment] def withResources(limits: Resource, requests: Resource): Container =
+    this.copy(resources = resources.copy(limits = limits, requests = requests))
+
 }
 
 case class Resources(

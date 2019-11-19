@@ -31,4 +31,14 @@ class ResourcesSpec extends FlatSpec with Matchers {
     val aCoresNumber: Short = (Random.nextInt(10) + 1).toShort
     Cpu.fromCores(aCoresNumber) shouldBe Cpu(aCoresNumber*1000)
   }
+
+  "resources" can "be updated individually" in {
+    val limit = Resource(Cpu.fromCores(1), Memory(512))
+    val request = Resource(Cpu(500), Memory(128))
+    val resources = Resources(request, limit)
+    resources.copy(
+      requests = limit.copy(memory = Memory(1024)),
+      limits = limit.copy(memory = Memory(2048))
+    )
+  }
 }

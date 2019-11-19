@@ -94,8 +94,7 @@ object Keys extends Keys {
         .addCommand(kubeSetting(command).value, kubeSetting(args).value)
         .replicas(kubeSetting(replicas).value)
         .addEnv(kubeSetting(envs).value)
-        .requestResource(kubeSetting(resourceRequests).value)
-        .limit(kubeSetting(resourceLimits).value)
+        .resources(kubeSetting(resourceLimits).value, kubeSetting(resourceRequests).value)
         .pullPolicy(kubeSetting(imagePullPolicy).value)
   )
 

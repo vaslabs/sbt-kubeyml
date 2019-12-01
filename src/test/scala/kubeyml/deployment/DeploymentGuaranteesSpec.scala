@@ -22,9 +22,10 @@
 package kubeyml.deployment
 
 import kubeyml.deployment.api._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class DeploymentGuaranteesSpec extends WordSpec with Matchers{
+class DeploymentGuaranteesSpec extends AnyWordSpec with Matchers{
 
   "deployment" must {
     "not accept empty docker images" in {

@@ -72,8 +72,6 @@ object JsonSpec {
     appSelector: NonEmptyString,
     ports: List[PortVariable]
   )
-  import org.scalacheck.ScalacheckShapeless._
-
 
   implicit lazy val arbitraryNonEmptyString: Arbitrary[NonEmptyString] =
     Arbitrary(Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString))

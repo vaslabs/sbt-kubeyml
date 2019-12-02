@@ -6,7 +6,7 @@ An sbt plugin to generate typesafe kubernetes deployment plans for scala project
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.4")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.5")
 ```
 
 Add the plugin in your project and enable it
@@ -33,7 +33,7 @@ kubeyml:gen
 |  application | The name of the deployment  |  Default value is project name  |
 |  dockerImage | The docker image to deploy in a single container |  Default is the picked from sbt-native-packager |
 | ports | List of container ports optionally tagged with name | dockerExposedPorts from docker plugin|
-| livenessProbe  | Healtcheck probe  | `HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)` |
+| livenessProbe  | Healthcheck probe  | `HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)` |
 | readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
 | annotations  | `Map[String, String]` for spec template annotations (e.g. aws roles)  | empty  |
 | replicas | the number of replicas to be deployed| 2 |
@@ -62,7 +62,7 @@ lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https
 lazy val deploymentSettings = Seq(
   namespace in kube := "my-namespace", //default is name in thisProject
   application in kube := deploymentName, //default is name in thisProject
-  command in kube := "webserver",
+  command in kube := Some("webserver"),
   args in kube := Seq("-c","/path/to/config"),
   envs in kube := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),

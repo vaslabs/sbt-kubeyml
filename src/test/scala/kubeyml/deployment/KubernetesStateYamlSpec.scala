@@ -29,12 +29,13 @@ import io.circe.syntax._
 import io.circe.yaml.parser._
 import kubeyml.deployment.api._
 import kubeyml.deployment.json_support._
-import org.scalatest.{FlatSpec, Matchers}
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class KubernetesStateYamlSpec extends FlatSpec with Matchers with ScalaCheckPropertyChecks {
+class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   "deployment strategy" must "have the correct schema" in {
     forAll { (maxSurge: Int, maxUnavailable: Int) =>

@@ -21,11 +21,12 @@
 
 package kubeyml.deployment
 
-import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ResourcesSpec extends FlatSpec with Matchers {
+class ResourcesSpec extends AnyFlatSpec with Matchers {
 
   "from cores" must "give multiples of 1000" in {
     val aCoresNumber: Short = (Random.nextInt(10) + 1).toShort

@@ -21,6 +21,7 @@
 
 package kubeyml.deployment
 
+import kubeyml.protocol.NonEmptyString
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.ScalacheckShapeless._
 

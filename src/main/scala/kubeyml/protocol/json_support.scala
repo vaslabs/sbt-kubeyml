@@ -21,9 +21,15 @@
 
 package kubeyml.protocol
 
-case class NonEmptyString(value: String) {
-  require(value.nonEmpty)
-}
-case class PortNumber(value: Int) {
-  require(value >= 0 && value <= 65535)
+import io.circe.Encoder
+
+
+object json_support {
+
+  implicit val nonEmptyStringEncoder: Encoder[NonEmptyString] =
+    Encoder.encodeString.contramap(_.value)
+
+  implicit val portNumberEncoder: Encoder[PortNumber] =
+    Encoder.encodeInt.contramap(_.value)
+
 }

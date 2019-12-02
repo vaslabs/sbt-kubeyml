@@ -21,6 +21,7 @@
 
 package kubeyml.deployment
 
+import kubeyml.protocol.json_support._
 import io.circe.{Encoder, Json}
 
 object json_support {
@@ -107,7 +108,6 @@ object json_support {
     )
   }
 
-  implicit val nonEmptyStringEncoder: Encoder[NonEmptyString] = Encoder.encodeString.contramap(_.value)
 
   private val envRawValueEncoder: Encoder[EnvRawValue] = Encoder.encodeString.contramap(_.value)
 

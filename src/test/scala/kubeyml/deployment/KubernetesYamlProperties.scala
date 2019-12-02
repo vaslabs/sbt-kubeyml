@@ -27,7 +27,7 @@ import kubeyml.deployment.KubernetesComponents._
 import kubeyml.deployment.api._
 import kubeyml.deployment.json_support._
 import org.scalacheck._
-
+import kubeyml.deployment.api._
 import scala.concurrent.duration._
 import scala.util.{Failure, Try}
 
@@ -42,7 +42,9 @@ class KubernetesYamlProperties extends Properties("yaml"){
             .service(serviceName)
             .withImage(dockerImage)
             .withProbes(
-              livenessProbe = HttpProbe(HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds),
+              livenessProbe = HttpProbe(
+                HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds
+              ),
               readinessProbe = NoProbe
             )
             .replicas(1)

@@ -23,10 +23,10 @@ package kubeyml.deployment.plugin
 
 import kubeyml.deployment._
 import kubeyml.deployment.api._
-
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
+import kubeyml.protocol.NonEmptyString
 
 trait Keys {
   val dockerImage = settingKey[String]("The docker image to deploy")

@@ -21,6 +21,8 @@
 
 package kubeyml.deployment
 
+import kubeyml.protocol.NonEmptyString
+
 package object api {
 
   def deploy: EmptyDeployment =

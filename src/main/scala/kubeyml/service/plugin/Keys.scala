@@ -22,7 +22,6 @@
 package kubeyml.service.plugin
 
 import kubeyml.service.{Service, Port}
-import sbt.Configuration
 import sbt._
 import sbt.Keys._
 import kubeyml.deployment.plugin.{Keys => DeploymentKeys}

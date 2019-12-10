@@ -19,11 +19,41 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.protocol
+package kubeyml.service.plugin
 
-case class NonEmptyString(value: String) {
-  require(value.nonEmpty, "Empty strings are not allowed")
+import java.io.{File, PrintWriter}
+
+import kubeyml.service.Service
+import kubeyml.service.json_support._
+import io.circe.yaml.syntax._
+import io.circe.syntax._
+import kubeyml.deployment.Deployment
+import sbt.AutoPlugin
+
+class Plugin {
+
 }
-case class PortNumber(value: Int) {
-  require(value >= 0 && value <= 65535, "Out of port range [0,65535]")
+
+
+object KubeServicePlugin extends AutoPlugin {
+  override def trigger = noTrigger
+  override def requires = sbt.plugins.JvmPlugin
+
+  override val projectSettings = sbt.inConfig(Keys.kube)(Keys.kubeymlSettings)
+
+}
+
+object Plugin {
+  def generate(deployment: Deployment, service: Service, buildTarget: File): Unit = {
+    kubeyml.deployment.plugin.Plugin.generate(deployment, buildTarget)
+    val genTarget = new File(buildTarget, "kubeyml")
+    genTarget.mkdirs()
+    val file = new File(genTarget, "service.yml")
+    val printWriter = new PrintWriter(file)
+    try {
+      printWriter.println(service.asJson.asYaml.spaces4)
+    } finally {
+      printWriter.close()
+    }
+  }
 }

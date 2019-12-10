@@ -21,7 +21,7 @@
 
 package kubeyml.deployment
 
-import kubeyml.protocol.NonEmptyString
+import kubeyml.protocol.{NonEmptyString, PortNumber}
 
 import scala.concurrent.duration._
 
@@ -258,11 +258,11 @@ case class Command(cmd: NonEmptyString)
 
 case class Header(name: NonEmptyString, value: NonEmptyString)
 
-case class Port(name: Option[String], containerPort: Int)
+case class Port(name: Option[String], containerPort: PortNumber)
 
 object Port {
 
-  def apply(name: String, containerPort: Int): Port =
+  def apply(name: String, containerPort: PortNumber): Port =
     if (name.isEmpty)
       apply(None, containerPort)
     else

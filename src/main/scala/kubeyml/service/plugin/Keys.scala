@@ -19,11 +19,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.protocol
+package kubeyml.service.plugin
 
-case class NonEmptyString(value: String) {
-  require(value.nonEmpty, "Empty strings are not allowed")
+import kubeyml.service.{Service, Port}
+import sbt.Configuration
+import sbt._
+import sbt.Keys._
+import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+
+trait Keys {
+
+  val portMappings = settingKey[List[Port]](
+    "The ports to map from the service definition to the pod"
+  )
+
+  val service = settingKey[Service]("The service definition")
+
+  val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
+
+  val kube = Configuration.of("KubeDeployment", "kubeyml")
 }
-case class PortNumber(value: Int) {
-  require(value >= 0 && value <= 65535, "Out of port range [0,65535]")
+
+object Keys extends Keys {
+  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
+    gen in kube := Plugin.generate(
+      (DeploymentKeys.deployment in kube).value,
+      (Keys.service in kube).value,
+      (target in ThisProject).value
+    ),
+    (service in kube) := Service.fromDeployment(
+      (DeploymentKeys.deployment in kube).value
+    )
+  )
 }
+

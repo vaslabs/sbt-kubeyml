@@ -21,7 +21,9 @@
 
 package kubeyml.service
 
+import kubeyml.deployment.Deployment
 import kubeyml.protocol.{NonEmptyString, PortNumber}
+import kubeyml.deployment.api._
 
 
 case class Service(
@@ -29,6 +31,18 @@ case class Service(
     namespace: NonEmptyString,
     spec: Spec
 )
+
+object Service {
+  def fromDeployment(deployment: Deployment): Service =
+    Service(
+      deployment.metadata.name,
+      deployment.metadata.namespace,
+      Spec(
+        NodePort,
+        AppSelector(deployment.metadata.name),
+        deployment.spec.template.spec.containers.flatMap(_.ports).map(Port.fromDeploymentPort))
+    )
+}
 
 case class Spec(
   `type`: ServiceType,
@@ -51,6 +65,18 @@ case class Port(
      port: PortNumber,
      targetPort: TargetPort
 )
+
+object Port {
+  def fromDeploymentPort(port: kubeyml.deployment.Port): Port = {
+    val portName = port.name.getOrElse(s"pn${port.containerPort.value}")
+    Port(
+      portName,
+      TCP,
+      port.containerPort,
+      port.name.fold[TargetPort](NumberedTargetPort(port.containerPort))(name => NamedTargetPort(name))
+    )
+  }
+}
 
 sealed trait NetworkProtocol
 case object TCP extends NetworkProtocol

@@ -147,7 +147,7 @@ Then your gitlab publish template will look like (example extended from above)
         - target/kubeyml/deployment.yml
         - target/kubeyml/service.yml
 ```
-And deploy by
+And deploy with
 ```yaml
 .deploy-template:
   stage: deploy

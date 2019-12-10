@@ -30,10 +30,6 @@ import io.circe.syntax._
 import kubeyml.deployment.Deployment
 import sbt.AutoPlugin
 
-class Plugin {
-
-}
-
 
 object KubeServicePlugin extends AutoPlugin {
   override def trigger = noTrigger

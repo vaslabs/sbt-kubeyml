@@ -2,7 +2,7 @@
 
 An sbt plugin to generate typesafe kubernetes deployment plans for scala projects
 
-## Usage
+## Deployment plugin
 
 ### Add the plugin to your plugins.sbt
 ```
@@ -25,7 +25,8 @@ Try to run
 kubeyml:gen
 ```
 
-## Properties
+
+### Properties
 
 | **sbt key**  | **description**  | **default**  | 
 |---|---|---|
@@ -46,9 +47,9 @@ kubeyml:gen
 | target | The directory to output the deployment.yml | target of this project |
 | deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
 
-## Recipes
+### Recipes
 
-### Single namespace, two types of deployments with secret and dependency
+#### Single namespace, two types of deployments with secret and dependency
 
 ```scala
 import kubeyml.deployment._
@@ -76,7 +77,7 @@ lazy val deploymentSettings = Seq(
 )
 ```
 
-### Gitlab CI/CD usage (followup from previous)
+#### Gitlab CI/CD usage (followup from previous)
 
 ```yaml
 stages:
@@ -122,4 +123,34 @@ deploy-prod:
    - publish-prod
 ```
 
+## Service plugin
 
+This plugin relies on the deployment plugin and every property is derived from that.
+
+There's some room for customisation.
+
+```
+enablePlugins(KubeServicePlugin)
+```
+
+Then your publish template will look like
+
+```yaml
+.publish-template:
+  stage: publish-image
+  script:
+      - sbt docker:publish
+      - sbt kubeyml:gen
+  artifacts:
+      untracked: true
+      paths:
+        - target/kubeyml/deployment.yml
+        - target/kubeyml/service.yml
+```
+
+### Properties
+
+| **sbt key**  | **description**  | **default**  |
+|---|---|---|
+| portMappings  | Port mappings against the deployment (service to pod)   |  Derived from deployment |
+| service  | Key configuration for modifying the service properties   |  Derived from deployment |

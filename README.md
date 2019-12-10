@@ -133,7 +133,7 @@ There's some room for customisation.
 enablePlugins(KubeServicePlugin)
 ```
 
-Then your publish template will look like
+Then your gitlab publish template will look like (example extended from above)
 
 ```yaml
 .publish-template:

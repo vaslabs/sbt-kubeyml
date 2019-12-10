@@ -21,6 +21,8 @@
 
 package kubeyml.deployment
 
+import kubeyml.protocol.{NonEmptyString, PortNumber}
+
 import scala.concurrent.duration._
 
 sealed trait KubernetesState
@@ -240,7 +242,6 @@ case class EnvSecretValue(name: NonEmptyString, key: NonEmptyString) extends Env
 
 case class EnvVarDefinition(name: NonEmptyString, value: EnvValue)
 
-// For more probes go https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 sealed trait Probe
 case class HttpProbe(httpGet: HttpGet,
                      initialDelay: FiniteDuration = 0 seconds,
@@ -257,11 +258,11 @@ case class Command(cmd: NonEmptyString)
 
 case class Header(name: NonEmptyString, value: NonEmptyString)
 
-case class Port(name: Option[String], containerPort: Int)
+case class Port(name: Option[String], containerPort: PortNumber)
 
 object Port {
 
-  def apply(name: String, containerPort: Int): Port =
+  def apply(name: String, containerPort: PortNumber): Port =
     if (name.isEmpty)
       apply(None, containerPort)
     else
@@ -277,6 +278,3 @@ sealed trait ImagePullPolicy
 case object Always extends ImagePullPolicy
 case object IfNotPresent extends ImagePullPolicy
 
-case class NonEmptyString(value: String) {
-  require(value.nonEmpty)
-}

@@ -21,6 +21,8 @@
 
 package kubeyml.deployment
 
+import kubeyml.protocol.{NonEmptyString, PortNumber}
+
 package object api {
 
   def deploy: EmptyDeployment =
@@ -32,6 +34,10 @@ package object api {
   }
 
   implicit def fromNonEmptyString(value: NonEmptyString): String = value.value
+
+  implicit def toPortNumber(value: Int): PortNumber = PortNumber(value)
+  implicit def fromPortNumber(portNumber: PortNumber): Int = portNumber.value
+
 
   implicit final class KubernetesDeploymentOps(val kubernetesDeployment: EmptyDeployment) extends AnyVal {
     def namespace(name: String): NamespaceDeployment = NamespaceDeployment(name)

@@ -30,7 +30,7 @@ import KubernetesComponents._
 
 class IngressJsonSpec extends Properties("ingress"){
 
-  property("validdefinitions") = Prop.forAllNoShrink(validDefinitionsGen){ valid: ValidDefinitions => {
+  property("validdefinitions") = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
       val expectedJson = ingress(valid).right.get
 
       val httpRules = valid.rules.map {

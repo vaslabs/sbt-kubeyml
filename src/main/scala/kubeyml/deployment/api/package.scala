@@ -38,10 +38,10 @@ package object api {
   implicit def toPortNumber(value: Int): PortNumber = PortNumber(value)
   implicit def fromPortNumber(portNumber: PortNumber): Int = portNumber.value
 
-
   implicit final class KubernetesDeploymentOps(val kubernetesDeployment: EmptyDeployment) extends AnyVal {
     def namespace(name: String): NamespaceDeployment = NamespaceDeployment(name)
   }
+
   implicit final class NamespaceDeploymentOps(val namespaceDeployment: NamespaceDeployment) extends AnyVal {
     def service(name: String): AppDeployment = AppDeployment(namespaceDeployment.namespace, name)
   }
@@ -111,8 +111,10 @@ package object api {
 
     def limitResource(resource: Resource): Deployment =
       deployment.limit(resource)
+
     def pullDockerImage(pullPolicy: ImagePullPolicy): Deployment =
       deployment.pullPolicy(pullPolicy)
+
     def rollingUpdate(rollingUpdate: RollingUpdate): Deployment =
       deployment.withUpdateStrategy(rollingUpdate)
   }

@@ -21,10 +21,11 @@
 
 package kubeyml.protocol
 
-import io.circe.Encoder
-
+import io.circe.{Encoder, KeyEncoder}
 
 object json_support {
+
+  implicit val nonEmptyStringKeyEncoder: KeyEncoder[NonEmptyString] = KeyEncoder.encodeKeyString.contramap(_.value)
 
   implicit val nonEmptyStringEncoder: Encoder[NonEmptyString] =
     Encoder.encodeString.contramap(_.value)

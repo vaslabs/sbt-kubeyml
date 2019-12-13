@@ -19,36 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.service.plugin
+package kubeyml.ingress
 
-import kubeyml.service.{Service, Port}
-import sbt._
-import sbt.Keys._
-import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import kubeyml.protocol.{NonEmptyString, PortNumber}
 
-trait Keys {
+sealed trait Ingress
 
-  val portMappings = settingKey[List[Port]](
-    "The ports to map from the service definition to the pod"
-  )
+case class CustomIngress(name: NonEmptyString, namespace: NonEmptyString, annotations: Map[NonEmptyString, NonEmptyString], spec: Spec)
+    extends Ingress
 
-  val service = settingKey[Service]("The service definition")
+case class Spec(rules: List[Rule])
 
-  val gen = taskKey[Unit]("Generates a kubernetes yml file for deployment")
+sealed trait Rule
 
-  val kube = Configuration.of("KubeDeployment", "kubeyml")
+case class Host(value: String) {
+  require(value.nonEmpty, "Hostname cannot be empty")
+  require(value.matches("(\\w\\.?)*"), s"Hostname has a wrong format ${value}")
 }
 
-object Keys extends Keys {
+case class HttpRule(host: Host, paths: List[Path]) extends Rule
 
-  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := Plugin.generate(
-      (DeploymentKeys.deployment in kube).value,
-      (Keys.service in kube).value,
-      (target in ThisProject).value
-    ),
-    (service in kube) := Service.fromDeployment(
-      (DeploymentKeys.deployment in kube).value
-    )
-  )
+case class Path(serviceMapping: ServiceMapping, value: NonEmptyString) {
+  require(java.nio.file.Paths.get(value.value).toAbsolutePath.toString == value.value, s"Not a valid path ${value.value}")
 }
+
+case class ServiceMapping(serviceName: NonEmptyString, servicePort: PortNumber)

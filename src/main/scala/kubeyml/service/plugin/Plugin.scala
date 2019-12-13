@@ -30,7 +30,6 @@ import io.circe.syntax._
 import kubeyml.deployment.Deployment
 import sbt.AutoPlugin
 
-
 object KubeServicePlugin extends AutoPlugin {
   override def trigger = noTrigger
   override def requires = sbt.plugins.JvmPlugin
@@ -40,6 +39,7 @@ object KubeServicePlugin extends AutoPlugin {
 }
 
 object Plugin {
+
   def generate(deployment: Deployment, service: Service, buildTarget: File): Unit = {
     kubeyml.deployment.plugin.Plugin.generate(deployment, buildTarget)
     val genTarget = new File(buildTarget, "kubeyml")

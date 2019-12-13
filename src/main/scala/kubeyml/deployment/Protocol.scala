@@ -35,8 +35,10 @@ case class Deployment(
 
   private[kubeyml] def addContainerPorts(ports: List[Port]): Deployment =
     this.copy(spec = spec.addContainerPorts(ports))
+
   private[kubeyml] def annotateSpecTemplate(annotations: Map[String, String]): Deployment =
     this.copy(spec = spec.annotate(annotations))
+
   private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
     this.copy(spec = spec.addContainerEnvs(envs))
 
@@ -55,6 +57,7 @@ case class Deployment(
 
   private[kubeyml] def pullPolicy(pullPolicy: ImagePullPolicy): Deployment =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
+
   private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
     this.copy(spec = spec.withUpdateStrategy(rollingUpdate))
 
@@ -74,11 +77,12 @@ case class Spec(
   strategy: DeploymentStrategy
 ) {
 
-
   private[deployment] def addContainerPorts(ports: List[Port]): Spec =
     this.copy(template = template.addContainerPorts(ports))
+
   private[deployment] def annotate(annotations: Map[String, String]): Spec =
     this.copy(template = template.annotate(annotations))
+
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
     this.copy(template = template.addContainerEnvs(envs))
 
@@ -147,7 +151,6 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Template =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
 
-
 }
 
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
@@ -158,10 +161,13 @@ case class TemplateSpec(containers: List[Container]) {
     this.copy(containers = containers.map { container =>
       container.copy(ports = container.ports ++ ports)
     })
+
   private[deployment] def addContainerCmd(command: Option[NonEmptyString], args: Seq[String]): TemplateSpec =
     this.copy(containers = containers.map(_.addCommand(command, args)))
+
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
     this.copy(containers = containers.map(_.addEnvs(envs)))
+
   private[deployment] def requestResource(resource: Resource): TemplateSpec =
     this.copy(containers = containers.map(_.requestResource(resource)))
 
@@ -191,6 +197,7 @@ case class Container(
 
   private[deployment] def addEnvs(envs: Map[EnvName, EnvValue]): Container =
     this.copy(env = env ++ envs)
+
   private[deployment] def addCommand(cmd: Option[NonEmptyString], args: Seq[String]): Container = {
     val containerCmd = cmd.map(Command)
     this.copy(command = containerCmd, args = args)
@@ -198,6 +205,7 @@ case class Container(
 
   private[deployment] def requestResource(resource: Resource): Container =
     this.copy(resources = resources.copy(requests = resource))
+
   private[deployment] def limitResource(resource: Resource): Container =
     this.copy(resources = resources.copy(limits = resource))
 
@@ -230,6 +238,7 @@ object Cpu {
     Cpu(number * 1000)
   }
 }
+
 case class Memory(value: Int) {
   require(value > 0)
 }
@@ -243,13 +252,15 @@ case class EnvSecretValue(name: NonEmptyString, key: NonEmptyString) extends Env
 case class EnvVarDefinition(name: NonEmptyString, value: EnvValue)
 
 sealed trait Probe
-case class HttpProbe(httpGet: HttpGet,
-                     initialDelay: FiniteDuration = 0 seconds,
-                     timeout: FiniteDuration = 1 second,
-                     period: FiniteDuration = 10 seconds,
-                     failureThreshold: Short = 3,
-                     successThreshold: Short = 1)
-    extends Probe
+
+case class HttpProbe(
+  httpGet: HttpGet,
+  initialDelay: FiniteDuration = 0 seconds,
+  timeout: FiniteDuration = 1 second,
+  period: FiniteDuration = 10 seconds,
+  failureThreshold: Short = 3,
+  successThreshold: Short = 1
+) extends Probe
 case object NoProbe extends Probe
 
 case class HttpGet(path: NonEmptyString, port: Int, httpHeaders: List[Header])
@@ -277,4 +288,3 @@ sealed trait ImagePullPolicy
 
 case object Always extends ImagePullPolicy
 case object IfNotPresent extends ImagePullPolicy
-

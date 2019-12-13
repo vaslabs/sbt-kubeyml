@@ -25,8 +25,8 @@ import io.circe.{Encoder, Json}
 import io.circe.syntax._
 import io.circe.generic.semiauto._
 import kubeyml.protocol.json_support._
-object json_support {
 
+object json_support {
 
   implicit val serviceTypeEncoder: Encoder[ServiceType] = Encoder.encodeString.contramap {
     case NodePort => "NodePort"
@@ -52,16 +52,15 @@ object json_support {
 
   implicit val specEncoder: Encoder[Spec] = deriveEncoder
 
-  implicit val serviceEncoder: Encoder[Service] = Encoder.instance {
-    service =>
-      Json.obj(
-        "kind" -> "Service".asJson,
-        "apiVersion" -> "v1".asJson,
-        "metadata" -> Json.obj(
-          "name" -> service.name.asJson,
-          "namespace" -> service.namespace.asJson
-        ),
-        "spec" -> service.spec.asJson
-      )
+  implicit val serviceEncoder: Encoder[Service] = Encoder.instance { service =>
+    Json.obj(
+      "kind" -> "Service".asJson,
+      "apiVersion" -> "v1".asJson,
+      "metadata" -> Json.obj(
+        "name" -> service.name.asJson,
+        "namespace" -> service.namespace.asJson
+      ),
+      "spec" -> service.spec.asJson
+    )
   }
 }

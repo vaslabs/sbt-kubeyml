@@ -57,6 +57,7 @@ trait Keys {
 }
 
 object Keys extends Keys {
+
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := {
       Plugin.generate(

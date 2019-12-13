@@ -25,12 +25,12 @@ import java.io.{File, PrintWriter}
 
 import kubeyml.deployment.Deployment
 import kubeyml.deployment.json_support._
-import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.yaml.syntax._
 import sbt.AutoPlugin
 
 object Plugin {
+
   def generate(deployment: Deployment, buildTarget: File): Unit = {
     val genTarget = new File(buildTarget, "kubeyml")
     genTarget.mkdirs()

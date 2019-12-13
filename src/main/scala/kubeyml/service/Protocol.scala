@@ -25,14 +25,14 @@ import kubeyml.deployment.Deployment
 import kubeyml.protocol.{NonEmptyString, PortNumber}
 import kubeyml.deployment.api._
 
-
 case class Service(
-    name: NonEmptyString,
-    namespace: NonEmptyString,
-    spec: Spec
+  name: NonEmptyString,
+  namespace: NonEmptyString,
+  spec: Spec
 )
 
 object Service {
+
   def fromDeployment(deployment: Deployment): Service =
     Service(
       deployment.metadata.name,
@@ -40,7 +40,8 @@ object Service {
       Spec(
         NodePort,
         AppSelector(deployment.metadata.name),
-        deployment.spec.template.spec.containers.flatMap(_.ports).map(Port.fromDeploymentPort))
+        deployment.spec.template.spec.containers.flatMap(_.ports).map(Port.fromDeploymentPort)
+      )
     )
 }
 
@@ -50,7 +51,6 @@ case class Spec(
   ports: List[Port]
 )
 
-
 sealed trait ServiceType
 
 case object NodePort extends ServiceType
@@ -58,15 +58,15 @@ case object NodePort extends ServiceType
 sealed trait Selector
 case class AppSelector(appName: NonEmptyString) extends Selector
 
-
 case class Port(
-     name: NonEmptyString,
-     protocol: NetworkProtocol,
-     port: PortNumber,
-     targetPort: TargetPort
+  name: NonEmptyString,
+  protocol: NetworkProtocol,
+  port: PortNumber,
+  targetPort: TargetPort
 )
 
 object Port {
+
   def fromDeploymentPort(port: kubeyml.deployment.Port): Port = {
     val portName = port.name.getOrElse(s"pn${port.containerPort.value}")
     Port(
@@ -80,7 +80,6 @@ object Port {
 
 sealed trait NetworkProtocol
 case object TCP extends NetworkProtocol
-
 
 sealed trait TargetPort
 case class NamedTargetPort(name: NonEmptyString) extends TargetPort

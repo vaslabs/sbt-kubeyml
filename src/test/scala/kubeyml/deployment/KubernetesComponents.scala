@@ -62,7 +62,6 @@ trait KubernetesComponents {
     Arbitrary(Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString))
 
   val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] = {
-    implicit val arbitraryString: Arbitrary[String] = Arbitrary(Gen.alphaNumStr)
     implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
   }.filterNot {
     case EnvironmentVariableTestParts(fieldPathName, _, secretEnvName, _, _, rawName, _) =>

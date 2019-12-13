@@ -61,8 +61,10 @@ trait KubernetesComponents {
   implicit val nonEmptyStringGen: Arbitrary[NonEmptyString] =
     Arbitrary(Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString))
 
-  val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] = {
-    implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
+  val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] ={ for {
+    envTestParts <- implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
+    alphaNumRawValue <- Gen.alphaNumStr
+  } yield (envTestParts.copy(rawValue = alphaNumRawValue))
   }.filterNot {
     case EnvironmentVariableTestParts(fieldPathName, _, secretEnvName, _, _, rawName, _) =>
       Seq(fieldPathName == secretEnvName, fieldPathName == rawName, secretEnvName == rawName)
@@ -70,6 +72,7 @@ trait KubernetesComponents {
   }
 
 }
+
 
 object KubernetesComponents extends KubernetesComponents
 

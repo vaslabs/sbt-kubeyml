@@ -34,8 +34,7 @@ libraryDependencies ++= Seq(
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.5.1")
 
 lazy val pluginSettings = Seq(
-  sbtPlugin := true,
-  crossSbtVersions := Seq("1.2.8", "1.3.3")
+  sbtPlugin := true
 )
 
 lazy val publishSettings = Seq(

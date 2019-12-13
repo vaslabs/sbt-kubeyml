@@ -33,7 +33,7 @@ import json_support._
 class IngressJsonSpec extends Properties("ingress"){
   import IngressJsonSpec._
 
-  property("valid definitions")) = Prop.forAll(IngressJsonSpec.validDefinitionsGen) {
+  property("valid definitions") = Prop.forAll(IngressJsonSpec.validDefinitionsGen) {
     valid =>
       val expectedJson = ingress(valid).right.get
 

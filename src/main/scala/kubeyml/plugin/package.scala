@@ -19,36 +19,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.service.plugin
+package kubeyml
 
-import kubeyml.service.{Service, Port}
-import sbt._
-import sbt.Keys._
-import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import java.io.{File, PrintWriter}
 
-trait Keys {
+import io.circe.Encoder
+import io.circe.syntax._
+import io.circe.yaml.syntax._
 
-  val portMappings = settingKey[List[Port]](
-    "The ports to map from the service definition to the pod"
-  )
+package object plugin {
 
-  val service = settingKey[Service]("The service definition")
-
-  val gen = taskKey[Unit]("Generates a kubernetes service yml file derived from the generated deployment")
-
-  val kube = Configuration.of("KubeDeployment", "kubeyml")
-}
-
-object Keys extends Keys {
-
-  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := Plugin.generate(
-      (DeploymentKeys.deployment in kube).value,
-      (Keys.service in kube).value,
-      (target in ThisProject).value
-    ),
-    (service in kube) := Service.fromDeployment(
-      (DeploymentKeys.deployment in kube).value
-    )
-  )
+  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
+    val genTarget = new File(buildTarget, "kubeyml")
+    genTarget.mkdirs()
+    val file = new File(genTarget, s"${kind}.yml")
+    val printWriter = new PrintWriter(file)
+    try {
+      printWriter.println(a.asJson.asYaml.spaces4)
+    } finally {
+      printWriter.close()
+    }
+  }
 }

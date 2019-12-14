@@ -66,8 +66,8 @@ trait KubernetesComponents {
 
   private val annotationsGen = Gen.mapOf (for {
       key <- arbitraryNonEmptyString
-      value <- arbitraryNonEmptyString
-    } yield key.value -> value.value
+      value <- Gen.alphaNumStr
+    } yield key.value -> value
   )
 
   val validDefinitionsGen: Gen[ValidDefinitions] = for {

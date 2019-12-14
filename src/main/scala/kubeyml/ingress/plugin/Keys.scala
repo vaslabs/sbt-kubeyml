@@ -19,36 +19,48 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.service.plugin
+package kubeyml.ingress.plugin
 
-import kubeyml.service.{Service, Port}
+import kubeyml.ingress._
+import kubeyml.deployment.api._
+import kubeyml.service.plugin.{Keys => ServiceKeys}
+import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import kubeyml.protocol.NonEmptyString
 import sbt._
 import sbt.Keys._
-import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
 
 trait Keys {
 
-  val portMappings = settingKey[List[Port]](
-    "The ports to map from the service definition to the pod"
-  )
+  val ingress = settingKey[Ingress]("Kubernetes ingress definition")
 
-  val service = settingKey[Service]("The service definition")
+  val ingressRules = settingKey[List[Rule]]("Mapping rules from an ingress to a service")
 
-  val gen = taskKey[Unit]("Generates a kubernetes service yml file derived from the generated deployment")
+  val name = settingKey[String]("The name of the ingress")
+
+  val annotations = settingKey[Map[NonEmptyString, String]]("Set annotations for the ingress metadata")
 
   val kube = Configuration.of("KubeDeployment", "kubeyml")
+
+  val gen = taskKey[Unit]("Generates a kubernetes yml file for ingress")
+
 }
 
 object Keys extends Keys {
-
   lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := Plugin.generate(
       (DeploymentKeys.deployment in kube).value,
-      (Keys.service in kube).value,
-      (target in ThisProject).value
+      (ServiceKeys.service in kube).value,
+      (Keys.ingress in kube).value,
+      (target in ThisProject).value,
+      (streams.value.log)
     ),
-    (service in kube) := Service.fromDeployment(
-      (DeploymentKeys.deployment in kube).value
+
+    ingress in kube := CustomIngress(
+      (DeploymentKeys.application in kube).value,
+      (DeploymentKeys.namespace in kube).value,
+      (annotations in kube).value,
+      Spec((ingressRules in kube).value)
     )
   )
 }
+

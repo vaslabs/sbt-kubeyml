@@ -25,7 +25,7 @@ import kubeyml.protocol.{NonEmptyString, PortNumber}
 
 sealed trait Ingress
 
-case class CustomIngress(name: NonEmptyString, namespace: NonEmptyString, annotations: Map[NonEmptyString, NonEmptyString], spec: Spec)
+case class CustomIngress(name: NonEmptyString, namespace: NonEmptyString, annotations: Map[NonEmptyString, String], spec: Spec)
     extends Ingress
 
 case class Spec(rules: List[Rule])

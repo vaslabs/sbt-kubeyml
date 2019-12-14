@@ -39,8 +39,8 @@ class IngressJsonSpec extends Properties("ingress"){
           HttpRule(Host(ruleVariable.host), paths)
       }
 
-      val nonEmptyAnnotations: Map[NonEmptyString, NonEmptyString] = valid.annotations.map {
-        case (key, value) => NonEmptyString(key) -> NonEmptyString(value)
+      val nonEmptyAnnotations: Map[NonEmptyString, String] = valid.annotations.map {
+        case (key, value) => NonEmptyString(key) -> value
       }
       val ingressDef: Ingress = CustomIngress(valid.name, valid.namespace, nonEmptyAnnotations, Spec(httpRules))
       val generatedJson = ingressDef.asJson

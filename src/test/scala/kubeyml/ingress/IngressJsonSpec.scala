@@ -19,15 +19,40 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.api
+package kubeyml.ingress
 
-sealed trait EmptyDeployment
-object EmptyDeployment extends EmptyDeployment
-case class NamespaceDeployment(namespace: String)
-case class AppDeployment(namespace: String, service: String)
+import org.scalacheck._
+import kubeyml.deployment.api._
+import kubeyml.protocol.NonEmptyString
+import json_support._
+import io.circe.syntax._
+import KubernetesComponents._
 
-case class DockerisedAppDeployment(namespace: String, service: String, image: String) {
-  require(image.nonEmpty, "Image must not be empty")
-  require(namespace.nonEmpty, "Namespace must not be empty")
-  require(service.nonEmpty, "Namespace must not be empty")
+class IngressJsonSpec extends Properties("ingress"){
+
+  property("validdefinitions") = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
+      val expectedJson = ingress(valid).right.get
+
+      val httpRules = valid.rules.map {
+        case ruleVariable =>
+          val paths = ruleVariable.paths.map(p => Path(ServiceMapping(p.serviceName, p.port), p.value))
+          HttpRule(Host(ruleVariable.host), paths)
+      }
+
+      val nonEmptyAnnotations: Map[NonEmptyString, String] = valid.annotations.map {
+        case (key, value) => NonEmptyString(key) -> value
+      }
+      val ingressDef: Ingress = CustomIngress(valid.name, valid.namespace, nonEmptyAnnotations, Spec(httpRules))
+      val generatedJson = ingressDef.asJson
+      if (generatedJson != expectedJson) {
+        println(generatedJson)
+        println(expectedJson)
+      }
+
+      generatedJson == expectedJson
+
+    }
+  }
+
+
 }

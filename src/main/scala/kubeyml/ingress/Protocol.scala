@@ -19,15 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.api
+package kubeyml.ingress
 
-sealed trait EmptyDeployment
-object EmptyDeployment extends EmptyDeployment
-case class NamespaceDeployment(namespace: String)
-case class AppDeployment(namespace: String, service: String)
+import kubeyml.protocol.{NonEmptyString, PortNumber}
 
-case class DockerisedAppDeployment(namespace: String, service: String, image: String) {
-  require(image.nonEmpty, "Image must not be empty")
-  require(namespace.nonEmpty, "Namespace must not be empty")
-  require(service.nonEmpty, "Namespace must not be empty")
+sealed trait Ingress
+
+case class CustomIngress(name: NonEmptyString, namespace: NonEmptyString, annotations: Map[NonEmptyString, String], spec: Spec)
+    extends Ingress
+
+case class Spec(rules: List[Rule])
+
+sealed trait Rule
+
+case class Host(value: String) {
+  require(value.nonEmpty, "Hostname cannot be empty")
+  require(value.matches("([a-zA-Z0-9\\-_]+\\.?)*"), s"Hostname has a wrong format ${value}")
 }
+
+case class HttpRule(host: Host, paths: List[Path]) extends Rule
+
+case class Path(serviceMapping: ServiceMapping, value: NonEmptyString) {
+  require(java.nio.file.Paths.get(value.value).toAbsolutePath.toString == value.value, s"Not a valid path ${value.value}")
+}
+
+case class ServiceMapping(serviceName: NonEmptyString, servicePort: PortNumber)

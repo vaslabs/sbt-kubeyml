@@ -125,7 +125,7 @@ deploy-prod:
 
 ## Service plugin
 
-This plugin relies on the deployment plugin and every property is derived from that.
+This plugin depends on the deployment plugin and every property is derived from that.
 
 There's some room for customisation.
 
@@ -163,3 +163,84 @@ And deploy with
 |---|---|---|
 | portMappings  | Port mappings against the deployment (service to pod)   |  Derived from deployment |
 | service  | Key configuration for modifying the service properties   |  Derived from deployment |
+
+
+## Ingress Plugin
+
+This plugin depends on the service plugin. It provides some safety nets to make sure the service name and service ports
+are mapped properly to the ingress configuration.
+
+To extend on the above, you can configure ingress generation with the following steps.
+
+1. Enable the plugin
+```sbt
+enablePlugins(KubeIngressPlugin)
+```
+
+2. Set an ingress name and a hostname
+```scala
+lazy val ingressName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-ingress-test")
+
+lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomain.smth")
+
+```
+
+3. Configure the plugin
+
+```scala
+  import kubeyml.protocol.NonEmptyString
+  import kubeyml.deployment.plugin.Keys._
+  import kubeyml.ingress.api._
+
+  import kubeyml.ingress.plugin.Keys._
+  import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
+  
+  val ingressSettings = Seq(
+      (ingressName in kube) := ingressName,
+      (ingressRules in kube) := List(
+        HttpRule(Host(hostName), List(
+          IngressPath(ServiceMapping(deploymentName, 8085), "/hello-world")
+        ))
+      ),
+      (ingressAnnotations in kube) := Map(
+        Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
+        Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
+        NonEmptyString("your-own-annotation-key") -> "value"
+      )
+    )
+``` 
+
+The command to generate the ingress is the same `kubeyml:gen` which will generate 3 yml files.
+
+#### Gitlab CI extension 
+
+Potentially the CI configuration evolves to
+
+```yaml
+.publish-template:
+  stage: publish-image
+  script:
+      - sbt docker:publish
+      - sbt kubeyml:gen
+  artifacts:
+      untracked: true
+      paths:
+        - target/kubeyml/deployment.yml
+        - target/kubeyml/service.yml
+        - target/kubeyml/ingress.yml
+.deploy-template:
+  stage: deploy
+  image: docker-image-that-has-your-kubectl-config
+  script:
+     - kubectl apply -f target/kubeyml/deployment.yml
+     - kubectl apply -f target/kubeyml/service.yml
+     - kubectl apply -f target/kubeyml/ingress.yml
+```
+
+### Properties
+
+| **sbt key**  | **description**  | **default**  |
+|---|---|---|
+| ingressRules  | A list of Rules (currently only supports HttpRule  |  N/A |
+| ingressName | The name of the ingress | The application name from deployment |
+| ingress  | Key configuration for modifying the ingress properties   |  Some values are derived from service |

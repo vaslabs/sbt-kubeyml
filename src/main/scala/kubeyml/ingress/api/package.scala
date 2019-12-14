@@ -19,15 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.deployment.api
+package kubeyml.ingress
 
-sealed trait EmptyDeployment
-object EmptyDeployment extends EmptyDeployment
-case class NamespaceDeployment(namespace: String)
-case class AppDeployment(namespace: String, service: String)
+import kubeyml.protocol.NonEmptyString
 
-case class DockerisedAppDeployment(namespace: String, service: String, image: String) {
-  require(image.nonEmpty, "Image must not be empty")
-  require(namespace.nonEmpty, "Namespace must not be empty")
-  require(service.nonEmpty, "Namespace must not be empty")
+package object api {
+
+  type AnnotationElement = (NonEmptyString, String)
+
+  object Annotate {
+
+    def nginxIngress(): AnnotationElement =
+      NonEmptyString("kubernetes.io/ingress.class") -> "nginx"
+
+    def nginxRewriteTarget(path: String): AnnotationElement =
+      NonEmptyString("nginx.ingress.kubernetes.io/rewrite-target") -> path
+  }
 }

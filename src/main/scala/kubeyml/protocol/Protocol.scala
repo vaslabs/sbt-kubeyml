@@ -24,6 +24,7 @@ package kubeyml.protocol
 case class NonEmptyString(value: String) {
   require(value.nonEmpty, "Empty strings are not allowed")
 }
+
 case class PortNumber(value: Int) {
   require(value >= 0 && value <= 65535, "Out of port range [0,65535]")
 }

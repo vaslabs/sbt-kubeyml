@@ -102,12 +102,12 @@ object json_support {
       "fieldRef" -> Json.obj("fieldPath" -> fieldValue.fieldPath.asJson)
     )
   }
+
   private val envSecretValueEncoder: Encoder[EnvSecretValue] = Encoder.instance { secretValue =>
     Json.obj(
       "secretKeyRef" -> secretValue.asJson
     )
   }
-
 
   private val envRawValueEncoder: Encoder[EnvRawValue] = Encoder.encodeString.contramap(_.value)
 

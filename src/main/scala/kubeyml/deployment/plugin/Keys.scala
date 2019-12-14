@@ -57,13 +57,13 @@ trait Keys {
 }
 
 object Keys extends Keys {
-  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := {
+
+  lazy val deploymentSettings: Seq[Def.Setting[_]] = Seq(
+    gen in kube :=
       Plugin.generate(
         (deployment in kube).value,
         (target in ThisProject).value
-      )
-    },
+      ),
     namespace := (name in ThisProject).value,
     application := (name in ThisProject).value,
     dockerImage := (dockerAlias).value.toString(),

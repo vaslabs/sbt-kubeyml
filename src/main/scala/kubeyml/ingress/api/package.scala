@@ -28,6 +28,7 @@ package object api {
   type AnnotationElement = (NonEmptyString, String)
 
   object Annotate {
+
     def nginxIngress(): AnnotationElement =
       NonEmptyString("kubernetes.io/ingress.class") -> "nginx"
 

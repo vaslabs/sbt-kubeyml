@@ -42,6 +42,7 @@ trait Keys {
 }
 
 object Keys extends Keys {
+
   lazy val ingressSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := Plugin.generate(
       (ServiceKeys.service in kube).value,
@@ -58,4 +59,3 @@ object Keys extends Keys {
     (ingressName in kube) := (application in kube).value
   )
 }
-

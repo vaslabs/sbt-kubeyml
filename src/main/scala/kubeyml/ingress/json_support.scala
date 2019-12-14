@@ -37,33 +37,37 @@ object json_support {
 
   implicit val pathEncoder: Encoder[Path] = Encoder.instance {
     case Path(ServiceMapping(serviceName, servicePort), path) =>
-      Json.obj("backend" -> Json.obj(
-        "serviceName" -> serviceName.asJson,
-        "servicePort" -> servicePort.asJson
-      ),
-      "path" -> path.asJson)
-  }
-
-  private val httpRuleEncoder: Encoder[HttpRule] = Encoder.instance {
-    httpRule =>
       Json.obj(
-        "host" -> httpRule.host.asJson,
-        "http" -> Json.obj("paths" -> httpRule.paths.asJson)
+        "backend" -> Json.obj(
+          "serviceName" -> serviceName.asJson,
+          "servicePort" -> servicePort.asJson
+        ),
+        "path" -> path.asJson
       )
   }
 
-  implicit val ruleEncoder: Encoder[Rule] = Encoder.instance {
-    case r: HttpRule =>httpRuleEncoder(r)
+  private val httpRuleEncoder: Encoder[HttpRule] = Encoder.instance { httpRule =>
+    Json.obj(
+      "host" -> httpRule.host.asJson,
+      "http" -> Json.obj("paths" -> httpRule.paths.asJson)
+    )
   }
 
-  private val customIngressEncoder: Encoder[CustomIngress] = Encoder.instance( custom => Json.obj(
-    "metadata" -> Json.obj(
-      "annotations" -> custom.annotations.asJson,
-      "name" -> custom.name.asJson,
-      "namespace" -> custom.namespace.asJson
-    ),
-    "spec" -> custom.spec.asJson
-  ))
+  implicit val ruleEncoder: Encoder[Rule] = Encoder.instance {
+    case r: HttpRule => httpRuleEncoder(r)
+  }
+
+  private val customIngressEncoder: Encoder[CustomIngress] = Encoder.instance(
+    custom =>
+      Json.obj(
+        "metadata" -> Json.obj(
+          "annotations" -> custom.annotations.asJson,
+          "name" -> custom.name.asJson,
+          "namespace" -> custom.namespace.asJson
+        ),
+        "spec" -> custom.spec.asJson
+      )
+  )
 
   implicit val ingressEncoder: Encoder[Ingress] = Encoder.instance {
     case custom: CustomIngress =>

@@ -133,7 +133,7 @@ There's some room for customisation.
 enablePlugins(KubeServicePlugin)
 ```
 
-Then your publish template will look like
+Then your gitlab publish template will look like (example extended from above)
 
 ```yaml
 .publish-template:
@@ -146,6 +146,15 @@ Then your publish template will look like
       paths:
         - target/kubeyml/deployment.yml
         - target/kubeyml/service.yml
+```
+And deploy with
+```yaml
+.deploy-template:
+  stage: deploy
+  image: docker-image-that-has-your-kubectl-config
+  script:
+     - kubectl apply -f target/kubeyml/deployment.yml     
+     - kubectl apply -f target/kubeyml/service.yml
 ```
 
 ### Properties

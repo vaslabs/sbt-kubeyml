@@ -21,35 +21,26 @@
 
 package kubeyml.service.plugin
 
-import java.io.{File, PrintWriter}
+import java.io.File
 
 import kubeyml.service.Service
+import kubeyml.deployment.plugin.Keys.kube
+import kubeyml.deployment.plugin.KubeDeploymentPlugin
 import kubeyml.service.json_support._
-import io.circe.yaml.syntax._
-import io.circe.syntax._
-import kubeyml.deployment.Deployment
+import kubeyml.plugin.writePlan
 import sbt.AutoPlugin
 
 object KubeServicePlugin extends AutoPlugin {
   override def trigger = noTrigger
-  override def requires = sbt.plugins.JvmPlugin
+  override def requires = KubeDeploymentPlugin
 
-  override val projectSettings = sbt.inConfig(Keys.kube)(Keys.kubeymlSettings)
+  override val projectSettings = sbt.inConfig(kube)(Keys.serviceSettings)
 
 }
 
 object Plugin {
 
-  def generate(deployment: Deployment, service: Service, buildTarget: File): Unit = {
-    kubeyml.deployment.plugin.Plugin.generate(deployment, buildTarget)
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, "service.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(service.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
+  def generate(service: Service, buildTarget: File): Unit = {
+    writePlan(service, buildTarget, "service")
   }
 }

@@ -34,7 +34,7 @@ sealed trait Rule
 
 case class Host(value: String) {
   require(value.nonEmpty, "Hostname cannot be empty")
-  require(value.matches("(\\w\\.?)*"), s"Hostname has a wrong format ${value}")
+  require(value.matches("([a-zA-Z0-9\\-_]+\\.?)*"), s"Hostname has a wrong format ${value}")
 }
 
 case class HttpRule(host: Host, paths: List[Path]) extends Rule

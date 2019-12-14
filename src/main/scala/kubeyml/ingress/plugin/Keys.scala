@@ -24,7 +24,7 @@ package kubeyml.ingress.plugin
 import kubeyml.ingress._
 import kubeyml.deployment.api._
 import kubeyml.service.plugin.{Keys => ServiceKeys}
-import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import kubeyml.deployment.plugin.Keys.{kube, gen, application, namespace}
 import kubeyml.protocol.NonEmptyString
 import sbt._
 import sbt.Keys._
@@ -35,30 +35,24 @@ trait Keys {
 
   val ingressRules = settingKey[List[Rule]]("Mapping rules from an ingress to a service")
 
-  val name = settingKey[String]("The name of the ingress")
+  val ingressName = settingKey[String]("The name of the ingress")
 
-  val annotations = settingKey[Map[NonEmptyString, String]]("Set annotations for the ingress metadata")
-
-  val kube = Configuration.of("KubeDeployment", "kubeyml")
-
-  val gen = taskKey[Unit]("Generates a kubernetes yml file for ingress")
+  val ingressAnnotations = settingKey[Map[NonEmptyString, String]]("Set annotations for the ingress metadata")
 
 }
 
 object Keys extends Keys {
-  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val ingressSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := Plugin.generate(
-      (DeploymentKeys.deployment in kube).value,
       (ServiceKeys.service in kube).value,
       (Keys.ingress in kube).value,
       (target in ThisProject).value,
       (streams.value.log)
     ),
-
     ingress in kube := CustomIngress(
-      (DeploymentKeys.application in kube).value,
-      (DeploymentKeys.namespace in kube).value,
-      (annotations in kube).value,
+      (application in kube).value,
+      (namespace in kube).value,
+      (ingressAnnotations in kube).value,
       Spec((ingressRules in kube).value)
     )
   )

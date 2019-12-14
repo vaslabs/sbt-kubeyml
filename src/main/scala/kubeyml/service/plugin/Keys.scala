@@ -24,7 +24,7 @@ package kubeyml.service.plugin
 import kubeyml.service.{Service, Port}
 import sbt._
 import sbt.Keys._
-import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import kubeyml.deployment.plugin.Keys.{gen, deployment, kube}
 
 trait Keys {
 
@@ -34,21 +34,17 @@ trait Keys {
 
   val service = settingKey[Service]("The service definition")
 
-  val gen = taskKey[Unit]("Generates a kubernetes service yml file derived from the generated deployment")
-
-  val kube = Configuration.of("KubeDeployment", "kubeyml")
 }
 
 object Keys extends Keys {
 
-  lazy val kubeymlSettings: Seq[Def.Setting[_]] = Seq(
+  lazy val serviceSettings: Seq[Def.Setting[_]] = Seq(
     gen in kube := Plugin.generate(
-      (DeploymentKeys.deployment in kube).value,
       (Keys.service in kube).value,
       (target in ThisProject).value
     ),
     (service in kube) := Service.fromDeployment(
-      (DeploymentKeys.deployment in kube).value
+      (deployment in kube).value
     )
   )
 }

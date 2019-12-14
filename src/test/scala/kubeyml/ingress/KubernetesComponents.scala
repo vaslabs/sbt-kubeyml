@@ -54,12 +54,18 @@ trait KubernetesComponents {
     path <- Gen.oneOf(arbitraryNonEmptyString.map(s => s"/$s"), Gen.const("/"))
   } yield PathVariable(serviceName, servicePort, path)
 
+  private val hostnameWordGen: Gen[String] =
+    Gen.oneOf(
+      Gen.nonEmptyListOf(arbitraryNonEmptyString.map(_.value)).map(_.mkString("-")),
+      Gen.nonEmptyListOf(arbitraryNonEmptyString.map(_.value)).map(_.mkString("_")),
+    )
+
   private val ruleVariableGen: Gen[RuleVariable] = for {
     host <- Gen.oneOf(
-      Gen.listOfN(2, arbitraryNonEmptyString.map(_.value)).map(_.mkString(".")),
-      Gen.listOfN(3, arbitraryNonEmptyString.map(_.value)).map(_.mkString(".")),
-      Gen.listOfN(4, arbitraryNonEmptyString.map(_.value)).map(_.mkString(".")),
-      Gen.const("localhost")
+      Gen.listOfN(2, hostnameWordGen).map(_.mkString(".")),
+      Gen.listOfN(3, hostnameWordGen).map(_.mkString(".")),
+      Gen.listOfN(4, hostnameWordGen).map(_.mkString(".")),
+      hostnameWordGen
     )
     pathVariable <- Gen.listOf(pathVariableGen)
   } yield RuleVariable(host, pathVariable)

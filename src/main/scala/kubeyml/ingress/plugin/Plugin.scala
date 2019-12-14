@@ -27,18 +27,19 @@ import cats.kernel.Semigroup
 import kubeyml.ingress._
 import kubeyml.service.Service
 import cats.syntax.semigroup._
-import kubeyml.deployment.Deployment
+import kubeyml.deployment.plugin.Keys.kube
 import json_support._
 import kubeyml.plugin._
+import kubeyml.service.plugin.KubeServicePlugin
 import sbt.AutoPlugin
 import sbt.util.Logger
 
 
-object KubeServicePlugin extends AutoPlugin {
+object KubeIngressPlugin extends AutoPlugin {
   override def trigger = noTrigger
-  override def requires = sbt.plugins.JvmPlugin
+  override def requires = KubeServicePlugin
 
-  override val projectSettings = sbt.inConfig(Keys.kube)(Keys.kubeymlSettings)
+  override val projectSettings = sbt.inConfig(kube)(Keys.ingressSettings)
 
 }
 
@@ -86,17 +87,16 @@ object Plugin {
     }
   }
 
-  def generate(deployment: Deployment, service: Service, ingress: Ingress, buildTarget: File, log: Logger) = {
+  def generate(service: Service, ingress: Ingress, buildTarget: File, log: Logger) = {
     validatePortMappings(service, ingress).map {
       ingress =>
-        kubeyml.service.plugin.Plugin.generate(deployment, service, buildTarget)
         generateIngress(ingress, buildTarget)
     }.left.map(_.foreach(f => log.error(f.message))).merge
   }
 
-  private[plugin] def generateIngress(ingress: Ingress, buildTarget: File): Unit = {
+  private[plugin] def generateIngress(ingress: Ingress, buildTarget: File): Unit =
     writePlan(ingress, buildTarget, "ingress")
-  }
+
 
 
 }

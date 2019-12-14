@@ -170,9 +170,9 @@ enablePlugins(KubeIngressPlugin)
 
 2. Set an ingress name and a hostname
 ```scala
-lazy val ingressName = sys.env.getOrElse("ADMIN_INGRESS_NAME", "helloworld-ingress-test")
+lazy val ingressName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-ingress-test")
 
-lazy val hostName = sys.env.getOrElse("ADMIN_HOST_NAME", "your-hostname.yourdomain.smth")
+lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomain.smth")
 
 ```
 
@@ -185,18 +185,20 @@ lazy val hostName = sys.env.getOrElse("ADMIN_HOST_NAME", "your-hostname.yourdoma
 
   import kubeyml.ingress.plugin.Keys._
   import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
-
-  (ingressName in kube) := ingressName,
-  (ingressRules in kube) := List(
-    HttpRule(Host(hostName), List(
-      IngressPath(ServiceMapping(deploymentName, 8085), "/")
-    ))
-  ),
-  (ingressAnnotations in kube) := Map(
-    Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
-    Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
-    NonEmptyString("your-own-annotation-key") -> "value"
-  )
+  
+  val ingressSettings = Seq(
+      (ingressName in kube) := ingressName,
+      (ingressRules in kube) := List(
+        HttpRule(Host(hostName), List(
+          IngressPath(ServiceMapping(deploymentName, 8085), "/hello-world")
+        ))
+      ),
+      (ingressAnnotations in kube) := Map(
+        Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
+        Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
+        NonEmptyString("your-own-annotation-key") -> "value"
+      )
+    )
 ``` 
 
 The command to generate the ingress is the same `kubeyml:gen` which will generate 3 yml files.
@@ -225,12 +227,6 @@ So potentially the CI configuration evolves to
 
 ### Properties
 
-  val ingress = settingKey[Ingress]("Kubernetes ingress definition")
-
-  val ingressRules = settingKey[List[Rule]]("Mapping rules from an ingress to a service")
-
-  val ingressName = settingKey[String]("The name of the ingress")
-  
 | **sbt key**  | **description**  | **default**  |
 |---|---|---|
 | ingressRules  | A list of Rules (currently only supports HttpRule  |  N/A |

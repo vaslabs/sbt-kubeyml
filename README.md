@@ -203,7 +203,10 @@ lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomai
 
 The command to generate the ingress is the same `kubeyml:gen` which will generate 3 yml files.
 
-So potentially the CI configuration evolves to
+#### Gitlab CI extension 
+
+Potentially the CI configuration evolves to
+
 ```yaml
 .publish-template:
   stage: publish-image

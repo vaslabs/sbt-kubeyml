@@ -179,6 +179,7 @@ lazy val hostName = sys.env.getOrElse("ADMIN_HOST_NAME", "your-hostname.yourdoma
 3. Configure the plugin
 
 ```scala
+  import kubeyml.protocol.NonEmptyString
   import kubeyml.deployment.plugin.Keys._
   import kubeyml.ingress.api._
 
@@ -193,7 +194,8 @@ lazy val hostName = sys.env.getOrElse("ADMIN_HOST_NAME", "your-hostname.yourdoma
   ),
   (ingressAnnotations in kube) := Map(
     Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
-    Annotate.nginxRewriteTarget("/hello-world") //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
+    Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
+    NonEmptyString("your-own-annotation-key") -> "value"
   )
 ``` 
 

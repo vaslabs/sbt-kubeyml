@@ -50,11 +50,12 @@ object Keys extends Keys {
       (streams.value.log)
     ),
     ingress in kube := CustomIngress(
-      (application in kube).value,
+      (ingressName in kube).value,
       (namespace in kube).value,
       (ingressAnnotations in kube).value,
       Spec((ingressRules in kube).value)
-    )
+    ),
+    (ingressName in kube) := (application in kube).value
   )
 }
 

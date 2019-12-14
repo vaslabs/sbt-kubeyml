@@ -222,3 +222,17 @@ So potentially the CI configuration evolves to
      - kubectl apply -f target/kubeyml/service.yml
      - kubectl apply -f target/kubeyml/ingress.yml
 ```
+
+### Properties
+
+  val ingress = settingKey[Ingress]("Kubernetes ingress definition")
+
+  val ingressRules = settingKey[List[Rule]]("Mapping rules from an ingress to a service")
+
+  val ingressName = settingKey[String]("The name of the ingress")
+  
+| **sbt key**  | **description**  | **default**  |
+|---|---|---|
+| ingressRules  | A list of Rules (currently only supports HttpRule  |  N/A |
+| ingressName | The name of the ingress | The application name from deployment |
+| ingress  | Key configuration for modifying the ingress properties   |  Some values are derived from service |

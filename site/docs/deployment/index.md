@@ -10,7 +10,7 @@ Deployment generates a deployment.yml file as specified in
 https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment
 
 The API is a bit opinionated from experiences in production and it forces you to set a liveness probe and a readiness probe.
-It also sets defaults on resources but you can custimise your own.
+It also sets defaults on resources but you can customise your own.
 
 
 Because deployment manifests can be quite big there is a DSL so you can create your own. The below

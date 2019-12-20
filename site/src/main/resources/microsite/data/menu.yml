@@ -1,0 +1,25 @@
+options:
+  - title: Deployment
+    url: deployment/
+    menu_section: deployment
+    nested_options:
+      - title: Recipes
+        menu_section: deployment
+        url: deployment/recipe/
+
+  - title: Service
+    url: service/
+    menu_section: service
+    nested_options:
+      - title: Recipes
+        menu_section: ingress
+        url: service/recipe/
+
+  - title: Ingress
+    url: ingress/
+    menu_section: ingress
+    nested_options:
+      - title:
+          Recipes
+        menu_section: ingress
+        url: ingress/recipe/

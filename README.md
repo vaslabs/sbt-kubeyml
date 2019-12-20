@@ -6,7 +6,7 @@ An sbt plugin to generate typesafe kubernetes deployment plans for scala project
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.7")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.8")
 ```
 
 Add the plugin in your project and enable it
@@ -179,7 +179,7 @@ enablePlugins(KubeIngressPlugin)
 
 2. Set an ingress name and a hostname
 ```scala
-lazy val ingressName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-ingress-test")
+lazy val ingressEnvName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-ingress-test")
 
 lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomain.smth")
 
@@ -193,13 +193,14 @@ lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomai
   import kubeyml.ingress.api._
 
   import kubeyml.ingress.plugin.Keys._
+  import kubeyml.service.plugin.Keys._
   import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
   
   val ingressSettings = Seq(
-      (ingressName in kube) := ingressName,
+      (ingressName in kube) := ingressEnvName,
       (ingressRules in kube) := List(
         HttpRule(Host(hostName), List(
-          IngressPath(ServiceMapping(deploymentName, 8085), "/hello-world")
+          IngressPath(ServiceMapping((service in kube).value.name, 8085), "/hello-world")
         ))
       ),
       (ingressAnnotations in kube) := Map(

@@ -1,3 +1,4 @@
+import microsites.ExtraMdFileConfig
 import xerial.sbt.Sonatype.GitHubHosting
 
 name := "sbt-kubeyml"
@@ -15,6 +16,12 @@ lazy val `kubeyml` = (project in file("."))
   .settings(releaseSettings)
   .settings(pluginSettings)
   .settings(compilerSettings)
+
+lazy val site = (project in file("site"))
+  .enablePlugins(MicrositesPlugin, MdocPlugin)
+  .settings(docSettings)
+  .settings(noPublishSettings)
+  .dependsOn(`kubeyml`)
 
 
 crossScalaVersions := Seq(scala212)
@@ -114,3 +121,32 @@ lazy val compilerSettings = Seq(
     "-Xfatal-warnings"
   )
 )
+
+lazy val docSettings = Seq(
+  micrositeName := "sbt-kubeyml",
+  micrositeDescription := "Autogenerate kubernetes manifests for your scala application",
+  micrositeUrl := "kubeyml.vaslabs.org",
+  micrositeAuthor := "Vasilis Nicolaou",
+  micrositeTwitter := "@vaslabs",
+  micrositeTwitterCreator := "@vaslabs",
+  micrositeGithubOwner := "vaslabs",
+  micrositeGithubRepo := "sbt-kubeyml",
+  micrositePushSiteWith := GitHub4s,
+  micrositeGitterChannel := false,
+  micrositeExtraMdFiles := Map(
+    file("README.md") -> ExtraMdFileConfig(
+      "index.md",
+      "home",
+      Map("section" -> "home", "position" -> "0", "permalink" -> "/")
+    )
+  )
+)
+lazy val noPublishSettings =
+  Seq(
+    skip in publish := true,
+    publish := (),
+    publishLocal := (),
+    publishArtifact := false,
+    publishTo := None
+  )
+

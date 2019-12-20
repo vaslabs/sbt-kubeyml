@@ -131,7 +131,7 @@ lazy val docSettings = Seq(
   micrositeTwitterCreator := "@vaslabs",
   micrositeGithubOwner := "vaslabs",
   micrositeGithubRepo := "sbt-kubeyml",
-  micrositePushSiteWith := GitHub4s,
+  micrositePushSiteWith := GHPagesPlugin,
   micrositeGitterChannel := false,
   micrositeExtraMdFiles := Map(
     file("README.md") -> ExtraMdFileConfig(
@@ -144,8 +144,8 @@ lazy val docSettings = Seq(
 lazy val noPublishSettings =
   Seq(
     skip in publish := true,
-    publish := (),
-    publishLocal := (),
+    publish := (()),
+    publishLocal := (()),
     publishArtifact := false,
     publishTo := None
   )

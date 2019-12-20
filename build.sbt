@@ -131,6 +131,7 @@ lazy val docSettings = Seq(
   micrositeTwitterCreator := "@vaslabs",
   micrositeGithubOwner := "vaslabs",
   micrositeGithubRepo := "sbt-kubeyml",
+  micrositeUrl := "http://sbt-kubeyml.vaslabs.org",
   micrositePushSiteWith := GHPagesPlugin,
   micrositeGitterChannel := false,
   micrositeExtraMdFiles := Map(
@@ -139,7 +140,11 @@ lazy val docSettings = Seq(
       "home",
       Map("section" -> "home", "position" -> "0", "permalink" -> "/")
     )
-  )
+  ),
+  excludeFilter in ghpagesCleanSite :=
+    new FileFilter{
+      def accept(f: File) = (ghpagesRepository.value / "CNAME").getCanonicalPath == f.getCanonicalPath
+    } || "versions.html"
 )
 lazy val noPublishSettings =
   Seq(

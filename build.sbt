@@ -131,6 +131,7 @@ lazy val docSettings = Seq(
   micrositeTwitterCreator := "@vaslabs",
   micrositeGithubOwner := "vaslabs",
   micrositeGithubRepo := "sbt-kubeyml",
+  micrositeUrl := "sbt-kubeyml.vaslabs.io",
   micrositePushSiteWith := GHPagesPlugin,
   micrositeGitterChannel := false,
   micrositeExtraMdFiles := Map(

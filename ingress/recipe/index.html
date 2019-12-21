@@ -30,9 +30,9 @@ on what’s going wrong.</p>
         <span class="o">))</span>
       <span class="o">),</span>
       <span class="o">(</span><span class="n">ingressAnnotations</span> <span class="n">in</span> <span class="n">kube</span><span class="o">)</span> <span class="o">:=</span> <span class="nc">Map</span><span class="o">(</span>
-        <span class="nv">Annotate</span><span class="o">.</span><span class="py">nginxIngress</span><span class="o">(),</span> <span class="c1">// this adds kubernetes.io/ingress.class: nginx</span>
-        <span class="nv">Annotate</span><span class="o">.</span><span class="py">nginxRewriteTarget</span><span class="o">(</span><span class="s">"/hello-world"</span><span class="o">),</span> <span class="c1">//this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world</span>
-        <span class="nc">NonEmptyString</span><span class="o">(</span><span class="s">"your-own-annotation-key"</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="s">"value"</span>
+        <span class="nv">Annotate</span><span class="o">.</span><span class="py">nginxIngress</span><span class="o">(),</span> <span class="c1">// this adds kubernetes.io/ingress.class: nginx
+</span>        <span class="nv">Annotate</span><span class="o">.</span><span class="py">nginxRewriteTarget</span><span class="o">(</span><span class="s">"/hello-world"</span><span class="o">),</span> <span class="c1">//this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
+</span>        <span class="nc">NonEmptyString</span><span class="o">(</span><span class="s">"your-own-annotation-key"</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="s">"value"</span>
       <span class="o">)</span>
     <span class="o">)</span>
 </code></pre></div></div>

@@ -182,11 +182,11 @@ enablePlugins(KubeIngressPlugin)
 ```
 
 2. Set an ingress name and a hostname
+
 ```scala
 lazy val ingressEnvName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-ingress-test")
 
 lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomain.smth")
-
 ```
 
 3. Configure the plugin

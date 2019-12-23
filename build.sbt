@@ -9,13 +9,30 @@ lazy val scala212 = "2.12.10"
 
 lazy val `kubeyml` = (project in file("."))
   .enablePlugins(AutomateHeaderPlugin, SbtPlugin)
-  .settings(pluginSettings)
   .settings(
     name := "sbt-kubeyml"
   ).settings(publishSettings)
   .settings(releaseSettings)
   .settings(pluginSettings)
   .settings(compilerSettings)
+
+lazy val `runbook` = (project in file("runbook"))
+  .enablePlugins(AutomateHeaderPlugin, SbtPlugin)
+  .settings(pluginSettings)
+  .settings(
+    name := "sbt-service-runbook"
+  ).settings(releaseSettings)
+  .settings(compilerSettings)
+  .settings(
+    Seq(
+      addSbtPlugin("com.47deg"  % "sbt-microsites" % Versions.Plugin.microsite ),
+      addSbtPlugin("org.scalameta" % "sbt-mdoc" % Versions.Plugin.mdoc  )
+    )
+  )
+  .settings(
+    libraryDependencies += "org.scalameta" %% "mdoc" % Versions.Plugin.mdoc
+  )
+  .dependsOn(`kubeyml`)
 
 lazy val site = (project in file("site"))
   .enablePlugins(MicrositesPlugin, MdocPlugin)

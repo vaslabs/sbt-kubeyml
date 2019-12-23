@@ -32,6 +32,7 @@ lazy val `runbook` = (project in file("runbook"))
   .settings(
     libraryDependencies += "org.scalameta" %% "mdoc" % Versions.Plugin.mdoc
   )
+  .settings(publishSettings)
   .dependsOn(`kubeyml`)
 
 lazy val site = (project in file("site"))

@@ -28,10 +28,11 @@ import kubeyml.protocol.json_support._
 
 object json_support {
 
-  private def defaultIngressParts: Json = Json.obj(
-    "apiVersion" -> "extensions/v1beta1".asJson,
+  private val defaultIngressParts: Json = Json.obj(
     "kind" -> "Ingress".asJson
   )
+
+  implicit val apiVersionEncoder: Encoder[ApiVersion] = Encoder.instance(_.show.asJson)
 
   implicit val hostEncoder: Encoder[Host] = Encoder.encodeString.contramap(_.value)
 
@@ -60,6 +61,7 @@ object json_support {
   private val customIngressEncoder: Encoder[CustomIngress] = Encoder.instance(
     custom =>
       Json.obj(
+        "apiVersion" -> custom.apiVersion.asJson,
         "metadata" -> Json.obj(
           "annotations" -> custom.annotations.asJson,
           "name" -> custom.name.asJson,

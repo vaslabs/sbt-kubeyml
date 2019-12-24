@@ -13,12 +13,12 @@ The ingress derives some properties from the service but it requires you to set 
 
 If we continue with our nginx example from the [service](service) section, the ingress looks like this
 
-```scala
+```scala mdoc:silent
 
 import kubeyml.ingress.{CustomIngress, Host, HttpRule, Ingress, ServiceMapping, Path => IngressPath, Spec => IngressSpec}
 import kubeyml.ingress.api.Annotate
 
-import kubeyml.deployment._
+import kubeyml.deployment.{HttpProbe, IfNotPresent, HttpGet, Port => DeployPort}
 import kubeyml.service._
 import kubeyml.deployment.api._
 import scala.concurrent.duration._
@@ -30,7 +30,7 @@ val deployment = deploy.namespace("yournamespace")
       readinessProbe = HttpProbe(HttpGet("/", port = 80, httpHeaders = List.empty), failureThreshold = 10)
     ).replicas(3)
     .pullDockerImage(IfNotPresent)
-    .addPorts(List(Port(None, 80))
+    .addPorts(List(DeployPort(None, 80))
   )
 
   val service = Service.fromDeployment(deployment)
@@ -44,6 +44,14 @@ val ingress: Ingress = CustomIngress(
       List(IngressPath(ServiceMapping("nginx-deployment", 80), "/testpath"))))
     )
 )
+```
+
+Since version 0.3.0, ingress uses the new API version following this migration [guide](https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/) 
+
+To switch to the legacy simply do:
+```scala mdoc:silent
+def toExtensions_v1beta1(customIngress: CustomIngress) =
+    customIngress.legacy
 ```
 
 This would generate the following yaml file

@@ -32,7 +32,6 @@ class IngressJsonSpec extends Properties("ingress"){
 
   property("validdefinitions") = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
       val expectedJson = ingress(valid).right.get
-
       val httpRules = valid.rules.map {
         case ruleVariable =>
           val paths = ruleVariable.paths.map(p => Path(ServiceMapping(p.serviceName, p.port), p.value))

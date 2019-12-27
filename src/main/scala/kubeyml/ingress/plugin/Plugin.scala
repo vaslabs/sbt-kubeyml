@@ -69,7 +69,7 @@ object Plugin {
 
   private[plugin] def validatePortMappings(service: Service, ingress: Ingress): Either[List[IngressFailure], Ingress] = {
     ingress match {
-      case CustomIngress(_, _, _, Spec(rules)) =>
+      case CustomIngress(_, _, _, Spec(rules), _) =>
         val validatedResult = rules
           .flatMap {
             case HttpRule(_, paths) =>

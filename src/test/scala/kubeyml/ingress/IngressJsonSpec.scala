@@ -35,7 +35,7 @@ class IngressJsonSpec extends Properties("ingress"){
     Test.Parameters.default
       .withTestCallback(ConsoleReporter(2))
 
-  propertyWithSeed("validdefinitions", Some("4MkUn89okrR9LXj33b5-LOdHtvDqBd1MRNRuKmlZ90E=")) = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
+  property("validdefinitions") = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
       val expectedJson = ingress(valid).right.get
       val httpRules = valid.rules.map {
         case ruleVariable =>

@@ -27,10 +27,15 @@ import kubeyml.protocol.NonEmptyString
 import json_support._
 import io.circe.syntax._
 import KubernetesComponents._
+import org.scalacheck.util.ConsoleReporter
 
 class IngressJsonSpec extends Properties("ingress"){
 
-  property("validdefinitions") = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
+  override def overrideParameters(p: Test.Parameters): Test.Parameters =
+    Test.Parameters.default
+      .withTestCallback(ConsoleReporter(2))
+
+  propertyWithSeed("validdefinitions", Some("4MkUn89okrR9LXj33b5-LOdHtvDqBd1MRNRuKmlZ90E=")) = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
       val expectedJson = ingress(valid).right.get
       val httpRules = valid.rules.map {
         case ruleVariable =>

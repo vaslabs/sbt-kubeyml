@@ -19,6 +19,22 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.roles.akka.cluster.plugin
+package kubeyml.roles
 
-object Plugin
+import org.scalacheck.{Prop, Properties}
+import io.circe.syntax._
+import json_support._
+class RoleJsonSpec extends Properties("rolejson") with KubernetesComponents {
+
+  property("validjson") = Prop.forAll(validDefinition) { validDefinition =>
+    val expectedJson = roleToJson(validDefinition)
+    val role = toRole(validDefinition)
+    val actualJson = role.asJson
+    if (actualJson != expectedJson) {
+      println(actualJson)
+      println(expectedJson)
+    }
+    actualJson == expectedJson
+  }
+
+}

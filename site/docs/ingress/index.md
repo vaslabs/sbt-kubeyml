@@ -46,17 +46,11 @@ val ingress: Ingress = CustomIngress(
 )
 ```
 
-Since version 0.3.0, ingress uses the new API version following this migration [guide](https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/) 
-
-To switch to the legacy simply do:
-```scala mdoc:silent
-def toExtensions_v1beta1(customIngress: CustomIngress) =
-    customIngress.legacy
-```
+Since version 0.2.9, ingress uses the new API version following this migration [guide](https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/) 
 
 This would generate the following yaml file
 ```yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
     annotations:
@@ -75,6 +69,11 @@ spec:
                 path: /testpath
 ```
 
+To switch to the legacy apiVersion simply do:
+```scala mdoc:silent
+def toExtensions_v1beta1(customIngress: CustomIngress) =
+    customIngress.legacy
+```
 
 
 Of course in most cases you won't have to write any of this as the sbt properties that sit on top of the API are

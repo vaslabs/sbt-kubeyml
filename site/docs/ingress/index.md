@@ -5,9 +5,7 @@ position: 3
 ---
 # Ingress
 
-This generates an ingress as defined here https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource
-minus the apiVersion which still uses the extension/v1beta1 (see [here](https://github.com/vaslabs/sbt-kubeyml/issues/37) for progress)
-
+This generates an ingress as defined [here](https://kubernetes.io/docs/concepts/services-networking/ingress/#the-ingress-resource)
 
 The ingress derives some properties from the service but it requires you to set the hostname.
 

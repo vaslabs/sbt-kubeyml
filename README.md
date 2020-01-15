@@ -249,3 +249,4 @@ Potentially the CI configuration evolves to
 | ingressRules  | A list of Rules (currently only supports HttpRule  |  N/A |
 | ingressName | The name of the ingress | The application name from deployment |
 | ingress  | Key configuration for modifying the ingress properties   |  Some values are derived from service |
+

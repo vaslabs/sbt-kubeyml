@@ -21,20 +21,29 @@
 
 package kubeyml.roles
 
-import org.scalacheck.{Prop, Properties}
-import io.circe.syntax._
+import org.scalacheck.Properties
+import org.scalacheck.Prop.forAll
 import json_support._
-class RoleJsonSpec extends Properties("rolejson") with KubernetesRole {
+import io.circe.syntax._
 
-  property("validjson") = Prop.forAll(validDefinition) { validDefinition =>
-    val expectedJson = roleToJson(validDefinition)
-    val role = toRole(validDefinition)
-    val actualJson = role.asJson
-    if (actualJson != expectedJson) {
-      println(actualJson)
-      println(expectedJson)
-    }
-    actualJson == expectedJson
+class RoleBindingSpec extends Properties("RoleBinding") with KubernetesRoleBinding {
+
+  property("validrolebinding") = forAll(roleBindingGen) {
+    case (serviceAccount, roleBinding) =>
+      val expectedJson = binding(
+        roleBinding.metadata.namespace.value,
+        roleBinding.metadata.name.value,
+        serviceAccount,
+        roleBinding.roleRef.role.metadata.name.value)
+
+      val actualJson = Right(roleBinding.asJson)
+
+      if (expectedJson != actualJson) {
+        println(expectedJson)
+        println(actualJson)
+      }
+
+      expectedJson == actualJson
   }
 
 }

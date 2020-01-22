@@ -29,7 +29,7 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 import kubeyml.deployment.api._
 import kubeyml.roles.ApiGroup.Core
-trait KubernetesComponents {
+trait KubernetesRole {
 
   private val arbitraryNonEmptyString: Gen[NonEmptyString] =
     Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString).map(NonEmptyString)

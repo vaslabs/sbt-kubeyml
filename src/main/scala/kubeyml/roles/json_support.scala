@@ -48,4 +48,33 @@ object json_support {
       )
   }
 
+  implicit val roleRefEncoder: Encoder[RoleRef] = Encoder.instance {
+    case RoleRef(Role(RoleMetadata(name, _), _)) =>
+      Json.obj(
+        "kind" -> "Role".asJson,
+        "name" -> name.asJson,
+        "apiGroup" -> "rbac.authorization.k8s.io".asJson
+      )
+  }
+
+  implicit val subjectEncoder: Encoder[Subject] = Encoder.instance {
+    case UserSubject(serviceAccount, namespace) =>
+      val identifier = s"system:serviceaccount:${namespace.value}:${serviceAccount.value}"
+      Json.obj(
+        "kind" -> "User".asJson,
+        "name" -> identifier.asJson
+      )
+  }
+
+  implicit val roleBindingEncoder: Encoder[RoleBinding] = Encoder.instance {
+    case RoleBinding(metadata, subjects, roleRef) =>
+      Json.obj(
+        "kind" -> "RoleBinding".asJson,
+        "apiVersion" -> "rbac.authorization.k8s.io/v1".asJson,
+        "metadata" -> metadata.asJson,
+        "subjects" -> subjects.asJson,
+        "roleRef" -> roleRef.asJson
+      )
+  }
+
 }

@@ -10,7 +10,7 @@ An sbt plugin to generate typesafe kubernetes deployment plans for scala project
 
 ### Add the plugin to your plugins.sbt
 ```
-addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.8")
+addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.2.9")
 ```
 
 Add the plugin in your project and enable it
@@ -249,3 +249,4 @@ Potentially the CI configuration evolves to
 | ingressRules  | A list of Rules (currently only supports HttpRule  |  N/A |
 | ingressName | The name of the ingress | The application name from deployment |
 | ingress  | Key configuration for modifying the ingress properties   |  Some values are derived from service |
+

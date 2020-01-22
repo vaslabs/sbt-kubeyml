@@ -40,4 +40,20 @@ package object plugin {
       printWriter.close()
     }
   }
+
+  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
+                                              encoderA: Encoder[A], encoder: Encoder[B]
+  ) = {
+    val genTarget = new File(buildTarget, "kubeyml")
+    genTarget.mkdirs()
+    val file = new File(genTarget, s"${kind}.yml")
+    val printWriter = new PrintWriter(file)
+    try {
+      printWriter.println(a.asJson.asYaml.spaces4)
+      printWriter.println("---")
+      printWriter.println(b.asJson.asYaml.spaces4)
+    } finally {
+      printWriter.close()
+    }
+  }
 }

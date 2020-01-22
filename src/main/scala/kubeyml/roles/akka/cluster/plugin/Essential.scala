@@ -20,24 +20,19 @@
  */
 
 package kubeyml.roles.akka.cluster.plugin
-import kubeyml.roles.json_support._
 
+import kubeyml.protocol.NonEmptyString
+import kubeyml.roles.ApiGroup.Core
+import kubeyml.roles.{Pods, Rule, Subject, UserSubject, Verb}
 
-import kubeyml.deployment.plugin.Keys.kube
-import kubeyml.deployment.plugin.KubeDeploymentPlugin
-import kubeyml.roles.{Role, RoleBinding}
+object Essential {
+  def subjects(namespace: NonEmptyString): List[Subject] = List(UserSubject(namespace = namespace))
 
-import sbt.AutoPlugin
-
-import java.io.File
-
-object AkkaClusterPlugin extends AutoPlugin {
-  override def trigger = noTrigger
-  override def requires = KubeDeploymentPlugin
-  override val projectSettings = sbt.inConfig(kube)(Seq.empty)
-}
-
-object Plugin {
-  def generate(role: Role, roleBinding: RoleBinding, target: File): Unit =
-    kubeyml.plugin.writePlansInSingle(role, roleBinding, target, "roles")
+  def rules = List(
+    Rule(
+      List(Core),
+      List(Pods),
+      List(Verb.Watch, Verb.Get, Verb.List)
+    )
+  )
 }

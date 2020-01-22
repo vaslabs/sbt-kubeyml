@@ -21,6 +21,62 @@
 
 package kubeyml.roles.akka.cluster.plugin
 
-trait Keys {
+import kubeyml.deployment.{EnvFieldValue, EnvName, EnvRawValue, HttpGet, HttpProbe}
+import kubeyml.roles.{Role, RoleBinding, RoleBindingMetadata, RoleMetadata, RoleRef}
+import sbt._
+import kubeyml.deployment.plugin.Keys.{envs, gen, kube, livenessProbe, readinessProbe}
+import kubeyml.deployment.plugin.{Keys => DeploymentKeys}
+import kubeyml.deployment.api._
+import sbt.Keys.target
 
+import scala.concurrent.duration._
+
+trait Keys {
+  val discoveryMethodEnv =
+    settingKey[Option[String]]("The name of the discovery method environment variable")
+  val hostnameEnv =
+    settingKey[Option[String]]("The name of the hostname environment variable")
+  val namespaceEnv = settingKey[Option[String]]("The name of the environment variable for the namespace")
+}
+
+object Keys extends Keys {
+  lazy val akkaClusterSettings: Seq[Def.Setting[_]] = Seq(
+    gen in kube := {
+
+      val akkaEnvironment = Map(List(
+          (discoveryMethodEnv in kube).value.map(EnvName(_)).map(_ -> EnvFieldValue("kubernetes-api")),
+          (hostnameEnv in kube).value.map(EnvName(_)).map(_ -> EnvFieldValue("status.podIP")),
+          (namespaceEnv in kube).value.map(EnvName(_)).map(_ -> EnvRawValue("metadata.namespace"))
+        ).flatten: _*
+      )
+
+      val updateEnvIfAbsent =
+        Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") ->
+          EnvFieldValue("metadata.labels['app']")) ++
+          akkaEnvironment ++
+          (envs in kube).value
+
+      livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds)
+      readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds)
+      (envs in kube) := updateEnvIfAbsent
+      (gen in kube).value
+      val namespace = (DeploymentKeys.namespace in kube).value
+      val role = Role(
+        RoleMetadata(
+          "pod-reader",
+          namespace
+        ),
+        Essential.rules
+      )
+      Plugin.generate(
+        role,
+        RoleBinding(
+          RoleBindingMetadata("read-pods", namespace),
+          Essential.subjects(namespace),
+          RoleRef(role)
+        ),
+        (target in ThisProject).value
+      )
+    }
+  )
 }

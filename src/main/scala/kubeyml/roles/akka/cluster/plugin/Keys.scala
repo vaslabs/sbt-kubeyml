@@ -41,6 +41,9 @@ trait Keys {
 
 object Keys extends Keys {
   lazy val akkaClusterSettings: Seq[Def.Setting[_]] = Seq(
+    discoveryMethodEnv := None,
+    hostnameEnv := None,
+    namespaceEnv := None,
     gen in kube := {
 
       val akkaEnvironment = Map(List(

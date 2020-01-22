@@ -34,7 +34,7 @@ import java.io.File
 object AkkaClusterPlugin extends AutoPlugin {
   override def trigger = noTrigger
   override def requires = KubeDeploymentPlugin
-  override val projectSettings = sbt.inConfig(kube)(Seq.empty)
+  override val projectSettings = sbt.inConfig(kube)(Keys.akkaClusterSettings)
 }
 
 object Plugin {

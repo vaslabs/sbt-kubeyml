@@ -47,7 +47,7 @@ stages:
       - sbt docker:publish
       - sbt kubeyml:gen
   artifacts:
-      untracked: true
+      untracked: false
       paths:
         - target/kubeyml/deployment.yml
 

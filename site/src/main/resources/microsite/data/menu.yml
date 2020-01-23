@@ -23,3 +23,15 @@ options:
           Recipes
         menu_section: ingress
         url: ingress/recipe/
+
+  - title: Akka cluster
+    url: akka-cluster/
+    menu_section: akka_cluster
+    nested_options:
+      - title: Settings
+        menu_section: akka_cluster
+        url: akka-cluster/settings/
+      - title: Recipes
+        menu_section: akka_cluster
+        url: akka-cluster/recipe/
+

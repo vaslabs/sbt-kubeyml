@@ -33,35 +33,26 @@ import scala.concurrent.duration._
 
 trait Keys {
   val discoveryMethodEnv =
-    settingKey[Option[String]]("The name of the discovery method environment variable")
+    settingKey[Option[EnvName]]("The name of the discovery method environment variable")
   val hostnameEnv =
-    settingKey[Option[String]]("The name of the hostname environment variable")
-  val namespaceEnv = settingKey[Option[String]]("The name of the environment variable for the namespace")
+    settingKey[Option[EnvName]]("The name of the hostname environment variable")
+  val namespaceEnv = settingKey[Option[EnvName]]("The name of the environment variable for the namespace")
 }
 
 object Keys extends Keys {
   lazy val akkaClusterSettings: Seq[Def.Setting[_]] = Seq(
-    discoveryMethodEnv := None,
-    hostnameEnv := None,
-    namespaceEnv := None,
+    discoveryMethodEnv in kube := None,
+    hostnameEnv in kube := None,
+    namespaceEnv in kube := None,
+    livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+    readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+    (envs in kube) ++=
+      Map(List(
+          (discoveryMethodEnv in kube).value.map(_ -> EnvFieldValue("kubernetes-api")),
+          (hostnameEnv in kube).value.map(_ -> EnvFieldValue("status.podIP")),
+          (namespaceEnv in kube).value.map(_ -> EnvRawValue("metadata.namespace"))
+        ).flatten: _*) ++ Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") -> EnvFieldValue("metadata.labels['app']")),
     gen in kube := {
-
-      val akkaEnvironment = Map(List(
-          (discoveryMethodEnv in kube).value.map(EnvName(_)).map(_ -> EnvFieldValue("kubernetes-api")),
-          (hostnameEnv in kube).value.map(EnvName(_)).map(_ -> EnvFieldValue("status.podIP")),
-          (namespaceEnv in kube).value.map(EnvName(_)).map(_ -> EnvRawValue("metadata.namespace"))
-        ).flatten: _*
-      )
-
-      val updateEnvIfAbsent =
-        Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") ->
-          EnvFieldValue("metadata.labels['app']")) ++
-          akkaEnvironment ++
-          (envs in kube).value
-
-      livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds)
-      readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds)
-      (envs in kube) := updateEnvIfAbsent
       (gen in kube).value
       val namespace = (DeploymentKeys.namespace in kube).value
       val role = Role(

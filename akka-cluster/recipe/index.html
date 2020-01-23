@@ -1,0 +1,106 @@
+<html><head><title>sbt-kubeyml: Recipes</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Vasilis Nicolaou" /><meta name="description" content="Autogenerate kubernetes manifests for your scala application" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="sbt-kubeyml: Recipes" /><meta name="title" property="og:title" content="sbt-kubeyml: Recipes" /><meta name="og:site_name" content="sbt-kubeyml" /><meta name="og:url" content="" /><meta name="og:type" content="website" /><meta name="og:description" content="Autogenerate kubernetes manifests for your scala application" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="sbt-kubeyml: Recipes" /><meta name="twitter:image" content="https://sbt-kubeyml.vaslabs.org/img/poster.png" /><meta name="twitter:description" content="Autogenerate kubernetes manifests for your scala application" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@vaslabs" /><meta name="twitter:creator" content="@vaslabs" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/vs.css" /><link rel="stylesheet" href="/css/light-style.css" /><link rel="stylesheet" href="/css/home.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><div id="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"></div><span>sbt-kubeyml</span></a><button id="main-toggle" class="sidebar-toggle"><span class="close"></span></button></div><div class="sidebar-nav"> <div class="sidebar-nav-item  "><a href="/deployment/" title="Deployment" class="drop-nested">Deployment</a><i class="fa fa-angle-right"></i><div class="sub-section"> <a href="/deployment/recipe/" title="Recipes" class="">Recipes</a></div></div> <div class="sidebar-nav-item  "><a href="/service/" title="Service" class="drop-nested">Service</a><i class="fa fa-angle-right"></i><div class="sub-section"> <a href="/service/recipe/" title="Recipes" class="">Recipes</a></div></div> <div class="sidebar-nav-item  "><a href="/ingress/" title="Ingress" class="drop-nested">Ingress</a><i class="fa fa-angle-right"></i><div class="sub-section"> <a href="/ingress/recipe/" title="Recipes" class="">Recipes</a></div></div> <div class="sidebar-nav-item  open"><a href="/akka-cluster/" title="Akka cluster" class="drop-nested">Akka cluster</a><i class="fa fa-angle-right"></i><div class="sub-section"> <a href="/akka-cluster/settings/" title="Settings" class="">Settings</a> <a href="/akka-cluster/recipe/" title="Recipes" class="active">Recipes</a></div></div></div></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/vaslabs/sbt-kubeyml" target="_blank" rel="noopener noreferrer"><i class="fa fa-eye"></i><span>Watchers<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/vaslabs/sbt-kubeyml" target="_blank" rel="noopener noreferrer"><i class="fa fa-star-o"></i><span>Stars<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="vaslabs" data-github-repo="sbt-kubeyml"><div class="content-wrapper"><section><h1 id="akka-cluster-configuration-with-akka-management">Akka cluster configuration with Akka management</h1>
+
+<p>You may have the configuration below in you application.conf</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>akka {
+  discovery.kubernetes-api {
+      # Namespace discovery path
+      #
+      # If this path doesn't exist, the namespace will default to "default".
+
+      # Namespace to query for pods.
+      #
+      # Set this value to a specific string to override discovering the namespace using pod-namespace-path.
+      pod-namespace = flerken
+      pod-namespace = ${?MY_NAMESPACE}
+
+      # Selector value to query pod API with.
+      # `%s` will be replaced with the configured effective name, which defaults to the actor system name
+      pod-label-selector = "app=%s"
+  }
+}
+
+akka.management {
+  cluster.bootstrap {
+    contact-point-discovery {
+      discovery-method = kubernetes-api
+    }
+  }
+}
+
+akka.management.http.port = 8558
+akka.management.http.hostname = ${?MY_HOSTNAME}
+</code></pre></div></div>
+
+<p>For the discovery to work, the hostname needs to be the podIp. By enabling this plugin you
+don’t need to have this configuration in the deployment.</p>
+
+<h2 id="example">Example</h2>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">kubeyml.deployment._</span>
+<span class="k">import</span> <span class="nn">kubeyml.deployment.api._</span>
+<span class="k">import</span> <span class="nn">kubeyml.deployment.plugin.Keys._</span>
+
+<span class="k">import</span> <span class="nn">kubeyml.roles.akka.cluster.plugin.Keys._</span>
+
+<span class="k">lazy</span> <span class="k">val</span> <span class="nv">akkaClusterKubernetesSettings</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
+  <span class="n">hostnameEnv</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">Some</span><span class="o">(</span><span class="nc">EnvName</span><span class="o">(</span><span class="s">"MY_HOSTNAME"</span><span class="o">)),</span>
+  <span class="n">namespaceEnv</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">Some</span><span class="o">(</span><span class="nc">EnvName</span><span class="o">(</span><span class="s">"MY_NAMESPACE"</span><span class="o">))</span>
+<span class="o">)</span>
+
+<span class="k">lazy</span> <span class="k">val</span> <span class="nv">deploymentSettings</span> <span class="k">=</span> <span class="nc">Seq</span><span class="o">(</span>
+  <span class="n">namespace</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="s">"my-namespace"</span><span class="o">,</span>
+  <span class="n">application</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="s">"my-application"</span><span class="o">,</span>
+  <span class="n">envs</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">++=</span> <span class="nc">Map</span><span class="o">(</span>
+    <span class="nc">EnvName</span><span class="o">(</span><span class="s">"ANOTHER_ENV"</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="nc">EnvRawValue</span><span class="o">(</span><span class="s">"something"</span><span class="o">)</span>
+  <span class="o">),</span>
+  <span class="n">resourceRequests</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">Resource</span><span class="o">(</span><span class="nv">Cpu</span><span class="o">.</span><span class="py">fromCores</span><span class="o">(</span><span class="mi">1</span><span class="o">),</span> <span class="nc">Memory</span><span class="o">(</span><span class="mi">512</span><span class="o">)),</span>
+  <span class="n">resourceLimits</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">Resource</span><span class="o">(</span><span class="nv">Cpu</span><span class="o">.</span><span class="py">fromCores</span><span class="o">(</span><span class="mi">2</span><span class="o">),</span> <span class="nc">Memory</span><span class="o">(</span><span class="mi">2048</span> <span class="o">+</span> <span class="mi">256</span><span class="o">))</span>
+<span class="o">)</span>
+</code></pre></div></div>
+
+<p>Notice that you don’t need to specify the liveness probe and the rediness probe. The <code class="highlighter-rouge">AkkaClusterPlugin</code> 
+configures the following probes:</p>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">livenessProbe</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">HttpProbe</span><span class="o">(</span><span class="nc">HttpGet</span><span class="o">(</span><span class="s">"/alive"</span><span class="o">,</span> <span class="mi">8558</span><span class="o">,</span> <span class="nv">List</span><span class="o">.</span><span class="py">empty</span><span class="o">),</span> <span class="mi">10</span> <span class="n">seconds</span><span class="o">,</span> <span class="mi">3</span> <span class="n">seconds</span><span class="o">,</span> <span class="mi">5</span> <span class="n">seconds</span><span class="o">),</span>
+<span class="n">readinessProbe</span> <span class="n">in</span> <span class="n">kube</span> <span class="o">:=</span> <span class="nc">HttpProbe</span><span class="o">(</span><span class="nc">HttpGet</span><span class="o">(</span><span class="s">"/ready"</span><span class="o">,</span> <span class="mi">8558</span><span class="o">,</span> <span class="nv">List</span><span class="o">.</span><span class="py">empty</span><span class="o">),</span> <span class="mi">10</span> <span class="n">seconds</span><span class="o">,</span> <span class="mi">3</span> <span class="n">seconds</span><span class="o">,</span> <span class="mi">5</span> <span class="n">seconds</span><span class="o">),</span>
+</code></pre></div></div>
+
+<p>The plugin only depends on the deployment plugin. If you need this exposed via an ingress you need to configure that yourself.</p>
+
+<h2 id="gitlab-integration">Gitlab integration</h2>
+
+<p>Following the example in <a href="/deployment/recipe">deployment</a>  you can modify the templates as below.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.publish-template</span><span class="pi">:</span>
+  <span class="na">stage</span><span class="pi">:</span> <span class="s">publish-image</span>
+  <span class="na">script</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">sbt kubeyml:gen</span>
+  <span class="na">artifacts</span><span class="pi">:</span>
+      <span class="na">untracked</span><span class="pi">:</span> <span class="no">false</span>
+      <span class="na">paths</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">target/kubeyml/</span>
+
+<span class="s">.deploy-template</span><span class="pi">:</span>
+  <span class="na">stage</span><span class="pi">:</span> <span class="s">deploy</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">docker-image-that-has-your-kubectl-config</span>
+  <span class="na">script</span><span class="pi">:</span>
+     <span class="pi">-</span> <span class="s">kubectl apply -f target/kubeyml/deployment.yml</span>
+     <span class="pi">-</span> <span class="s">kubectl apply -f target/kubeyml/roles.yml</span>
+</code></pre></div></div>
+</section></div></div></div></div><script src="/highlight/highlight.pack.js"></script><script>
+// For all code blocks, copy the language from the containing div
+// to the inner code tag (where hljs expects it to be)
+const langPrefix = 'language-';
+document.querySelectorAll(`div[class^='${langPrefix}']`).forEach(function(div) {
+  div.classList.forEach(function(cssClass) {
+    if (cssClass.startsWith(langPrefix)) {
+      const lang = cssClass.substring(langPrefix.length);
+      div.querySelectorAll('pre code').forEach(function(code) {
+        code.classList.add(lang);
+      });
+    }
+  });
+});
+
+hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlightingOnLoad();
+      </script><script>console.info('\x57\x65\x62\x73\x69\x74\x65\x20\x62\x75\x69\x6c\x74\x20\x77\x69\x74\x68\x3a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x5f\x5f\x0a\x20\x20\x20\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x5f\x20\x20\x2f\x20\x2f\x5f\x20\x20\x20\x20\x20\x20\x5f\x5f\x5f\x5f\x20\x5f\x5f\x5f\x20\x20\x28\x5f\x29\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x28\x5f\x29\x20\x2f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x0a\x20\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x60\x5f\x5f\x20\x5c\x2f\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x20\x2f\x20\x5f\x5f\x2f\x20\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x0a\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x5f\x2f\x20\x2f\x20\x2f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x5f\x5f\x2f\x20\x2f\x20\x20\x2f\x20\x2f\x5f\x2f\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x20\x2f\x5f\x2f\x20\x20\x5f\x5f\x28\x5f\x5f\x20\x20\x29\x0a\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2e\x5f\x5f\x5f\x2f\x5c\x5f\x5f\x2f\x20\x20\x20\x20\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x2f\x20\x20\x20\x5c\x5f\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x0a\x0a\x68\x74\x74\x70\x73\x3a\x2f\x2f\x34\x37\x64\x65\x67\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f\x2f\x73\x62\x74\x2d\x6d\x69\x63\x72\x6f\x73\x69\x74\x65\x73')</script><script src="/js/docs.js"></script></body></html>

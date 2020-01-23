@@ -48,9 +48,9 @@ object Keys extends Keys {
     readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
     (envs in kube) ++=
       Map(List(
-          (discoveryMethodEnv in kube).value.map(_ -> EnvFieldValue("kubernetes-api")),
+          (discoveryMethodEnv in kube).value.map(_ -> EnvRawValue("kubernetes-api")),
           (hostnameEnv in kube).value.map(_ -> EnvFieldValue("status.podIP")),
-          (namespaceEnv in kube).value.map(_ -> EnvRawValue("metadata.namespace"))
+          (namespaceEnv in kube).value.map(_ -> EnvFieldValue("metadata.namespace"))
         ).flatten: _*) ++ Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") -> EnvFieldValue("metadata.labels['app']")),
     gen in kube := {
       (gen in kube).value

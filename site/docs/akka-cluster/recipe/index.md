@@ -42,7 +42,7 @@ For the discovery to work, the hostname needs to be the podIp. By enabling this 
 don't need to have this configuration in the deployment.
 
 ## Example
-```sbt
+```scala
 import kubeyml.deployment._
 import kubeyml.deployment.api._
 import kubeyml.deployment.plugin.Keys._
@@ -67,7 +67,7 @@ lazy val deploymentSettings = Seq(
 
 Notice that you don't need to specify the liveness probe and the rediness probe. The `AkkaClusterPlugin` 
 configures the following probes:
-```
+```scala
 livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
 readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
 ```

@@ -13,3 +13,13 @@ plugin provides the ability to auto-generate the roles yaml file and also inject
 variables of the user's choice.
 
 See the [recipes](recipe/) section for examples and the [settings](settings/) for explanation on the available options.
+
+Alternatively you can get started by adding enabling the plugin and let the API lead you.
+
+```
+enablePlugins(KubeDeploymentPlugin, AkkaClusterPlugin)
+```
+
+```sbtshell
+kubeyml:gen
+```

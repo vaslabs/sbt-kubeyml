@@ -19,41 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.roles
 
-import java.io.{File, PrintWriter}
-
-import io.circe.Encoder
+import org.scalacheck.Properties
+import org.scalacheck.Prop.forAll
+import json_support._
 import io.circe.syntax._
-import io.circe.yaml.syntax._
 
-package object plugin {
+class RoleBindingSpec extends Properties("RoleBinding") with KubernetesRoleBinding {
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
+  property("validrolebinding") = forAll(roleBindingGen) {
+    case (serviceAccount, roleBinding) =>
+      val expectedJson = binding(
+        roleBinding.metadata.namespace.value,
+        roleBinding.metadata.name.value,
+        serviceAccount,
+        roleBinding.roleRef.role.metadata.name.value)
+
+      val actualJson = Right(roleBinding.asJson)
+
+      if (expectedJson != actualJson) {
+        println(expectedJson)
+        println(actualJson)
+      }
+
+      expectedJson == actualJson
   }
 
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
 }

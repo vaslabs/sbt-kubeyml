@@ -19,41 +19,22 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.roles
 
-import java.io.{File, PrintWriter}
-
-import io.circe.Encoder
+import org.scalacheck.{Prop, Properties}
 import io.circe.syntax._
-import io.circe.yaml.syntax._
+import json_support._
+class RoleJsonSpec extends Properties("rolejson") with KubernetesRole {
 
-package object plugin {
-
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
+  property("validjson") = Prop.forAll(validDefinition) { validDefinition =>
+    val expectedJson = roleToJson(validDefinition)
+    val role = toRole(validDefinition)
+    val actualJson = role.asJson
+    if (actualJson != expectedJson) {
+      println(actualJson)
+      println(expectedJson)
     }
+    actualJson == expectedJson
   }
 
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
 }

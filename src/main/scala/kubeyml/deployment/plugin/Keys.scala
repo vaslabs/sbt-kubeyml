@@ -79,7 +79,7 @@ object Keys extends Keys {
     resourceLimits := Resources().limits,
     command := None,
     args := Seq.empty,
-    imagePullPolicy := Always,
+    imagePullPolicy := IfNotPresent,
     deployment :=
       deploy
         .namespace(kubeSetting(namespace).value)

@@ -19,41 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.roles.akka.cluster.plugin
 
-import java.io.{File, PrintWriter}
+import kubeyml.protocol.NonEmptyString
+import kubeyml.roles.ApiGroup.Core
+import kubeyml.roles.{Pods, Rule, Subject, UserSubject, Verb}
 
-import io.circe.Encoder
-import io.circe.syntax._
-import io.circe.yaml.syntax._
+object Essential {
+  def subjects(namespace: NonEmptyString): List[Subject] = List(UserSubject(namespace = namespace))
 
-package object plugin {
-
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
-
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+  def rules = List(
+    Rule(
+      List(Core),
+      List(Pods),
+      List(Verb.Watch, Verb.Get, Verb.List)
+    )
+  )
 }

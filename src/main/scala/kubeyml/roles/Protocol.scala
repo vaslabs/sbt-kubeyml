@@ -19,41 +19,44 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.roles
 
-import java.io.{File, PrintWriter}
+import kubeyml.protocol.NonEmptyString
 
-import io.circe.Encoder
-import io.circe.syntax._
-import io.circe.yaml.syntax._
+case class Role(metadata: RoleMetadata, rules: List[Rule])
 
-package object plugin {
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+case class RoleMetadata(name: NonEmptyString, namespace: NonEmptyString)
+case class Rule(apiGroups: List[ApiGroup], resources: List[Resource], verbs: List[Verb])
 
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+sealed trait ApiGroup
+case object ApiGroup {
+  case object Core extends ApiGroup
 }
+
+sealed trait Verb
+object Verb {
+
+  case object Watch extends Verb
+
+  case object Get extends Verb
+
+  case object List extends Verb
+
+}
+
+sealed trait Resource
+case object Pods extends Resource
+
+case class RoleBinding(metadata: RoleBindingMetadata, subjects: List[Subject], roleRef: RoleRef)
+
+case class RoleBindingMetadata(name: NonEmptyString, namespace: NonEmptyString)
+
+sealed trait Subject
+
+case class UserSubject(
+          serviceAccount: NonEmptyString = NonEmptyString("default"),
+          namespace: NonEmptyString) extends Subject
+
+
+case class RoleRef(role: Role)

@@ -19,41 +19,25 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.roles.akka.cluster.plugin
+import kubeyml.roles.json_support._
 
-import java.io.{File, PrintWriter}
 
-import io.circe.Encoder
-import io.circe.syntax._
-import io.circe.yaml.syntax._
+import kubeyml.deployment.plugin.Keys.kube
+import kubeyml.deployment.plugin.KubeDeploymentPlugin
+import kubeyml.roles.{Role, RoleBinding}
 
-package object plugin {
+import sbt.AutoPlugin
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+import java.io.File
 
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+object AkkaClusterPlugin extends AutoPlugin {
+  override def trigger = noTrigger
+  override def requires = KubeDeploymentPlugin
+  override val projectSettings = sbt.inConfig(kube)(Keys.akkaClusterSettings)
+}
+
+object Plugin {
+  def generate(role: Role, roleBinding: RoleBinding, target: File): Unit =
+    kubeyml.plugin.writePlansInSingle(role, roleBinding, target, "roles")
 }

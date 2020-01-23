@@ -32,6 +32,23 @@
 <p>If you don’t set this values, the plugin assume that you have set them manually in the deployment settings and it
 won’t attempt to define them. Remember that these are for the environment variable <strong>names</strong> not the values. The
 values are set automatically as specified in the Akka documentation for kubernetes api discovery <a href="https://doc.akka.io/docs/akka-management/current/bootstrap/kubernetes-api.html">here</a></p>
+
+<p>The generated yaml file can contain the following environment variables</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">env</span><span class="pi">:</span>
+                <span class="pi">-</span>   <span class="na">name</span><span class="pi">:</span> <span class="s">MY_DISCOVERY_METHOD</span>
+                    <span class="na">value</span><span class="pi">:</span> <span class="s">kubernetes-api</span>
+                <span class="pi">-</span>   <span class="na">name</span><span class="pi">:</span> <span class="s">MY_HOSTNAME</span>
+                    <span class="na">valueFrom</span><span class="pi">:</span>
+                        <span class="na">fieldRef</span><span class="pi">:</span>
+                            <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">status.podIP</span>
+                <span class="pi">-</span>   <span class="na">name</span><span class="pi">:</span> <span class="s">AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME</span>
+                    <span class="na">valueFrom</span><span class="pi">:</span>
+                        <span class="na">fieldRef</span><span class="pi">:</span>
+                            <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.labels['app']</span>
+</code></pre></div></div>
+
+<p>The AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME environment variable is added by default. You can only control
+the 3 environment variables mentioned in the table above.</p>
 </section></div></div></div></div><script src="/highlight/highlight.pack.js"></script><script>
 // For all code blocks, copy the language from the containing div
 // to the inner code tag (where hljs expects it to be)

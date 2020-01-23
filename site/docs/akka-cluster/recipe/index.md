@@ -71,7 +71,7 @@ lazy val deploymentSettings = Seq(
 )
 ```
 
-Notice that you don't need to specify the liveness probe and the rediness probe. The `AkkaClusterPlugin` 
+Notice that you don't need to specify the liveness probe and the readiness probe. The `AkkaClusterPlugin` 
 configures the following probes:
 ```scala
 livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),

@@ -116,9 +116,12 @@ package object api {
       deployment.pullPolicy(pullPolicy)
 
     def rollingUpdate(rollingUpdate: RollingUpdate): Deployment =
-      deployment.withUpdateStrategy(rollingUpdate)
+      this.deploymentStrategy(rollingUpdate)
 
     def recreate: Deployment =
-      deployment.recreate
+      this.deploymentStrategy(Recreate)
+
+    def deploymentStrategy(deploymentStrategy: DeploymentStrategy): Deployment =
+      deployment.deploymentStrategy(deploymentStrategy)
   }
 }

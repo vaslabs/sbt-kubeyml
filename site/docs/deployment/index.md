@@ -29,6 +29,7 @@ deploy.namespace("yournamespace")
     ).replicas(3)
     .pullDockerImage(IfNotPresent)
     .addPorts(List(Port(None, 80)))
+    .rollingUpdate(RollingUpdate(0, 1)) //or you can do .recreate
 ```
 
 Would generate this yaml file

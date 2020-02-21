@@ -38,10 +38,11 @@ object json_support {
   }
 
   private def removeNulls[A](encoder: Encoder.AsObject[A]) =
-    encoder.mapJsonObject(_.filter { case (_, v) => !v.isNull && v.asArray.map(_.size > 0).getOrElse(true) })
+    encoder.mapJsonObject(_.filter { case (_, v) => !v.isNull && v.asArray.forall(_.nonEmpty) })
 
   implicit val deploymentStrategyEncoder: Encoder[DeploymentStrategy] = Encoder.instance {
     case r: RollingUpdate => rollingUpdateEncoder.apply(r)
+    case Recreate => Json.obj("type" -> "Recreate".asJson)
   }
 
   implicit val containerCmdEncoder: Encoder[Command] = Encoder.instance {

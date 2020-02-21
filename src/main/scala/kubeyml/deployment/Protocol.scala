@@ -58,8 +58,9 @@ case class Deployment(
   private[kubeyml] def pullPolicy(pullPolicy: ImagePullPolicy): Deployment =
     this.copy(spec = spec.withContainerPullPolicy(pullPolicy))
 
-  private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
-    this.copy(spec = spec.withUpdateStrategy(rollingUpdate))
+  private[kubeyml] def withDeploymentStrategy(deploymentStrategy: DeploymentStrategy): Deployment =
+    this.copy(spec = spec.withDeploymentStrategy(deploymentStrategy))
+
 
 }
 
@@ -101,8 +102,9 @@ case class Spec(
   private[deployment] def withContainerPullPolicy(pullPolicy: ImagePullPolicy): Spec =
     this.copy(template = template.withContainerPullPolicy(pullPolicy))
 
-  private[deployment] def withUpdateStrategy(rollingUpdate: RollingUpdate): Spec =
-    this.copy(strategy = rollingUpdate)
+  private[deployment] def withDeploymentStrategy(deploymentStrategy: DeploymentStrategy): Spec =
+    this.copy(strategy = deploymentStrategy)
+
 
 }
 
@@ -281,6 +283,8 @@ object Port {
 }
 
 sealed trait DeploymentStrategy
+
+case object Recreate extends DeploymentStrategy
 
 case class RollingUpdate(maxSurge: Int = 0, maxUnavailable: Int = 1) extends DeploymentStrategy
 

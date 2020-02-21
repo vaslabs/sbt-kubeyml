@@ -61,6 +61,9 @@ case class Deployment(
   private[kubeyml] def withUpdateStrategy(rollingUpdate: RollingUpdate): Deployment =
     this.copy(spec = spec.withUpdateStrategy(rollingUpdate))
 
+  private[kubeyml] def recreate: Deployment =
+    this.copy(spec = spec.recreate)
+
 }
 
 case class DeploymentMetadata(
@@ -103,6 +106,9 @@ case class Spec(
 
   private[deployment] def withUpdateStrategy(rollingUpdate: RollingUpdate): Spec =
     this.copy(strategy = rollingUpdate)
+
+  private[deployment] def recreate: Spec =
+    this.copy(strategy = Recreate)
 
 }
 
@@ -281,6 +287,8 @@ object Port {
 }
 
 sealed trait DeploymentStrategy
+
+case object Recreate extends DeploymentStrategy
 
 case class RollingUpdate(maxSurge: Int = 0, maxUnavailable: Int = 1) extends DeploymentStrategy
 

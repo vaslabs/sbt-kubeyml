@@ -22,13 +22,13 @@
 package kubeyml.deployment
 
 import KubernetesComponents._
-
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.yaml.parser._
 import kubeyml.deployment.api._
 import kubeyml.deployment.json_support._
+import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.concurrent.duration._
@@ -389,6 +389,27 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
     )
 
     actualResourcesJson shouldBe expectedResourcesJson
+  }
+
+  "deployment strategy json" must "comply to kubernetes schema" in {
+    forAll(Gen.oneOf[DeploymentStrategy](Recreate, RollingUpdate(0, 0))) { deploymentStrategy: DeploymentStrategy =>
+        deploymentStrategy match {
+          case Recreate =>
+            Right(deploymentStrategy.asJson) shouldBe parse(
+              """
+                |type: Recreate
+                |""".stripMargin)
+          case RollingUpdate(maxSurge, maxUnavailable) =>
+            Right(deploymentStrategy.asJson) shouldBe parse(
+              s"""
+                 |type: RollingUpdate
+                 |rollingUpdate:
+                 |  maxUnavailable: ${maxUnavailable}
+                 |  maxSurge: ${maxSurge}
+                 |""".stripMargin
+            )
+        }
+    }
   }
 
 }

@@ -117,5 +117,8 @@ package object api {
 
     def rollingUpdate(rollingUpdate: RollingUpdate): Deployment =
       deployment.withUpdateStrategy(rollingUpdate)
+
+    def recreate: Deployment =
+      deployment.recreate
   }
 }

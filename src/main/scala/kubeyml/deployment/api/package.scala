@@ -122,6 +122,6 @@ package object api {
       this.deploymentStrategy(Recreate)
 
     def deploymentStrategy(deploymentStrategy: DeploymentStrategy): Deployment =
-      deployment.deploymentStrategy(deploymentStrategy)
+      deployment.withDeploymentStrategy(deploymentStrategy)
   }
 }

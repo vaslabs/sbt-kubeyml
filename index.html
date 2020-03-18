@@ -8,7 +8,7 @@
 <h2 id="deployment-plugin">Deployment plugin</h2>
 
 <h3 id="add-the-plugin-to-your-pluginssbt">Add the plugin to your plugins.sbt</h3>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.3.1")
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.3.2")
 </code></pre></div></div>
 
 <p>Add the plugin in your project and enable it</p>
@@ -159,7 +159,7 @@
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
       <span class="pi">-</span> <span class="s">sbt kubeyml:gen</span>
   <span class="na">artifacts</span><span class="pi">:</span>
-      <span class="na">untracked</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">untracked</span><span class="pi">:</span> <span class="no">false</span>
       <span class="na">paths</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/deployment.yml</span>
 
@@ -209,7 +209,7 @@
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
       <span class="pi">-</span> <span class="s">sbt kubeyml:gen</span>
   <span class="na">artifacts</span><span class="pi">:</span>
-      <span class="na">untracked</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">untracked</span><span class="pi">:</span> <span class="no">false</span>
       <span class="na">paths</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/deployment.yml</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/service.yml</span>
@@ -306,7 +306,7 @@ are mapped properly to the ingress configuration.</p>
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
       <span class="pi">-</span> <span class="s">sbt kubeyml:gen</span>
   <span class="na">artifacts</span><span class="pi">:</span>
-      <span class="na">untracked</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">untracked</span><span class="pi">:</span> <span class="no">false</span>
       <span class="na">paths</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/deployment.yml</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/service.yml</span>
@@ -349,7 +349,7 @@ are mapped properly to the ingress configuration.</p>
   </tbody>
 </table>
 
-</div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><p>sbt-kubeyml is designed and developed by <a href="" target="_blank" rel="noopener noreferrer">Vasilis Nicolaou</a></p></div><div class="row"><div><p>Website built with <a href="https://47deg.github.io/sbt-microsites/" target="_blank" rel="noopener noreferrer">sbt-microsites</a> - © 2019 <a href="https://www.47deg.com/" target="_blank" rel="noopener noreferrer">47 Degrees</a></p></div></div></div></footer><script src="/highlight/highlight.pack.js"></script><script>
+</div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><p>sbt-kubeyml is designed and developed by <a href="" target="_blank" rel="noopener noreferrer">Vasilis Nicolaou</a></p></div><div class="row"><div><p>Website built with <a href="https://47degrees.github.io/sbt-microsites/" target="_blank" rel="noopener noreferrer">sbt-microsites</a> - © 2019 <a href="https://www.47deg.com/" target="_blank" rel="noopener noreferrer">47 Degrees</a></p></div></div></div></footer><script src="/highlight/highlight.pack.js"></script><script>
 // For all code blocks, copy the language from the containing div
 // to the inner code tag (where hljs expects it to be)
 const langPrefix = 'language-';

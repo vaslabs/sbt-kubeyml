@@ -94,7 +94,7 @@ stages:
       - sbt docker:publish
       - sbt kubeyml:gen
   artifacts:
-      untracked: true
+      untracked: false
       paths:
         - target/kubeyml/deployment.yml
 
@@ -146,7 +146,7 @@ Then your gitlab publish template will look like (example extended from above)
       - sbt docker:publish
       - sbt kubeyml:gen
   artifacts:
-      untracked: true
+      untracked: false
       paths:
         - target/kubeyml/deployment.yml
         - target/kubeyml/service.yml
@@ -228,7 +228,7 @@ Potentially the CI configuration evolves to
       - sbt docker:publish
       - sbt kubeyml:gen
   artifacts:
-      untracked: true
+      untracked: false
       paths:
         - target/kubeyml/deployment.yml
         - target/kubeyml/service.yml

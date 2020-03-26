@@ -107,7 +107,7 @@ On top of all this, there is an sbt layer which allows you to interact exclusive
 | command | Command for the container | empty |
 | args | arguments for the command | empty Seq |
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
-| resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(500), Memory(256))` |
+| resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(100), Memory(256))` |
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
 | target | The directory to output the deployment.yml | target of this project |
 | deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |

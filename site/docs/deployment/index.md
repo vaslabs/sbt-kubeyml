@@ -77,7 +77,7 @@ spec:
                     periodSeconds: 10
                 resources:
                     requests:
-                        cpu: 500m
+                        cpu: 100m
                         memory: 256Mi
                     limits:
                         cpu: 1000m

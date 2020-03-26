@@ -220,7 +220,7 @@ case class Container(
 }
 
 case class Resources(
-  requests: Resource = Resource(Cpu(500), Memory(256)),
+  requests: Resource = Resource(Cpu(100), Memory(256)),
   limits: Resource = Resource(Cpu(1000), Memory(512))
 ) {
   require(requests.cpu.value <= limits.cpu.value)

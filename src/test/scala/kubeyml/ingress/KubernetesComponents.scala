@@ -48,6 +48,9 @@ trait KubernetesComponents {
   private val arbitraryNonEmptyString: Gen[NonEmptyString] =
     Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString).map(NonEmptyString)
 
+  private val arbitraryNonEmptyLowercaseString: Gen[NonEmptyString] =
+    Gen.nonEmptyListOf(Gen.alphaLowerChar).map(_.mkString).map(NonEmptyString)
+
   private val pathVariableGen: Gen[PathVariable] = for {
     serviceName <- arbitraryNonEmptyString.map(_.value)
     servicePort <- Gen.chooseNum(0, 65535)
@@ -55,10 +58,8 @@ trait KubernetesComponents {
   } yield PathVariable(serviceName, servicePort, path)
 
   private val hostnameWordGen: Gen[String] =
-    Gen.oneOf(
-      Gen.nonEmptyListOf(arbitraryNonEmptyString.map(_.value)).map(_.mkString("-")),
-      Gen.nonEmptyListOf(arbitraryNonEmptyString.map(_.value)).map(_.mkString("_")),
-    )
+      Gen.nonEmptyListOf(arbitraryNonEmptyLowercaseString.map(_.value)).map(_.mkString("-"))
+
 
   private val ruleVariableGen: Gen[RuleVariable] = for {
     host <- Gen.oneOf(

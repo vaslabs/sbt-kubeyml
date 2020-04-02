@@ -59,8 +59,15 @@ case class Spec(rules: List[Rule])
 sealed trait Rule
 
 case class Host(value: String) {
+  private def errorMessage = s""""
+    Invalid value: ${value}:
+    a DNS-1123 subdomain must consist of lower case alphanumeric characters, '-' or '.',
+    and must start and end with an alphanumeric character
+    (e.g. 'example.com', regex used for validation is
+    '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+  """
   require(value.nonEmpty, "Hostname cannot be empty")
-  require(value.matches("([a-zA-Z0-9\\-_]+\\.?)*"), s"Hostname has a wrong format ${value}")
+  require(value.matches("[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"), errorMessage)
 }
 
 case class HttpRule(host: Host, paths: List[Path]) extends Rule

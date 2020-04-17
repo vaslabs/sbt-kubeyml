@@ -32,7 +32,7 @@ credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-yaml" % "0.12.0",
+  "io.circe" %% "circe-yaml" % "0.13.0",
   "org.scalatest" %% "scalatest" % "3.1.1" % Test,
   "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
   "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,

@@ -78,7 +78,8 @@ package object api {
                 readinessProbe,
                 Map.empty
               )
-            )
+            ),
+            List.empty
           )
         ),
         strategy = RollingUpdate()

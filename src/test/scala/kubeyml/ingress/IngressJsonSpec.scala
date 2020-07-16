@@ -23,7 +23,7 @@ package kubeyml.ingress
 
 import org.scalacheck._
 import kubeyml.deployment.api._
-import kubeyml.protocol.NonEmptyString
+import kubeyml.protocol.{Host, NonEmptyString}
 import json_support._
 import io.circe.syntax._
 import KubernetesComponents._

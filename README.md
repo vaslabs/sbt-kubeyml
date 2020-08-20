@@ -48,7 +48,7 @@ kubeyml:gen
 | envs | Map of environment variables, raw, field path or secret are supported| empty |
 | resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(100), Memory(256))` |
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
-| target | The directory to output the deployment.yml | target of this project |
+| target | The directory to output the deployment.yml | <target of this project> / kubeyml |
 | deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
 
 ### Recipes

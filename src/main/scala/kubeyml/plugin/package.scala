@@ -30,9 +30,8 @@ import io.circe.yaml.syntax._
 package object plugin {
 
   private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
+    buildTarget.mkdirs()
+    val file = new File(buildTarget, s"${kind}.yml")
     val printWriter = new PrintWriter(file)
     try {
       printWriter.println(a.asJson.asYaml.spaces4)
@@ -44,9 +43,8 @@ package object plugin {
   private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
                                               encoderA: Encoder[A], encoder: Encoder[B]
   ) = {
-    val genTarget = new File(buildTarget, "kubeyml")
-    genTarget.mkdirs()
-    val file = new File(genTarget, s"${kind}.yml")
+    buildTarget.mkdirs()
+    val file = new File(buildTarget, s"${kind}.yml")
     val printWriter = new PrintWriter(file)
     try {
       printWriter.println(a.asJson.asYaml.spaces4)

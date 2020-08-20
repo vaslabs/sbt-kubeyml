@@ -59,7 +59,7 @@ trait Keys {
 object Keys extends Keys {
 
   lazy val deploymentSettings: Seq[Def.Setting[_]] = Seq(
-    (target in kube) := (target in ThisProject).value,
+    (target in kube) := (target in ThisProject).value / "kubeyml",
     gen in kube :=
       Plugin.generate(
         (deployment in kube).value,

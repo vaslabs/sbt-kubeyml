@@ -43,7 +43,7 @@ object Keys extends Keys {
       (gen in kube).value
       Plugin.generate(
         (Keys.service in kube).value,
-        (target in ThisProject).value
+        (target in kube).value
       )
     },
     (service in kube) := Service.fromDeployment(

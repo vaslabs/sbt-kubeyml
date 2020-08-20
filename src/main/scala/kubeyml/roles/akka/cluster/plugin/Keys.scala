@@ -69,7 +69,7 @@ object Keys extends Keys {
           Essential.subjects(namespace),
           RoleRef(role)
         ),
-        (target in ThisProject).value
+        (target in kube).value
       )
     }
   )

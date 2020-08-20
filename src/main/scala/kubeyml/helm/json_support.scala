@@ -19,39 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.helm
 
-import java.io.{File, PrintWriter}
-
-import io.circe.Encoder
+import io.circe.{Encoder, Json}
 import io.circe.syntax._
-import io.circe.yaml.syntax._
+import kubeyml.protocol.json_support._
 
-package object plugin {
+object json_support {
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    buildTarget.mkdirs()
-    val file = new File(buildTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
-
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    buildTarget.mkdirs()
-    val file = new File(buildTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+  implicit val chartEncoder: Encoder[Chart] = Encoder.instance(
+    c =>
+      Json.obj(
+        "apiVersion" -> "v2".asJson,
+        "name" -> c.name.asJson,
+        "version" -> c.version.asJson
+      )
+  )
 }

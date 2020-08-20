@@ -24,6 +24,10 @@ options:
         menu_section: ingress
         url: ingress/recipe/
 
+  - title: Helm
+    url: helm/
+    menu_section: helm
+
   - title: Akka cluster
     url: akka-cluster/
     menu_section: akka_cluster

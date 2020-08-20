@@ -19,39 +19,23 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml
+package kubeyml.helm
 
-import java.io.{File, PrintWriter}
+import java.io.File
 
-import io.circe.Encoder
-import io.circe.syntax._
-import io.circe.yaml.syntax._
+import sbt.AutoPlugin
+import kubeyml.deployment.plugin.Keys.kube
 
-package object plugin {
+import json_support._
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
-    buildTarget.mkdirs()
-    val file = new File(buildTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+object HelmPlugin extends AutoPlugin {
+  override def trigger = noTrigger
 
-  private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
-    buildTarget.mkdirs()
-    val file = new File(buildTarget, s"${kind}.yml")
-    val printWriter = new PrintWriter(file)
-    try {
-      printWriter.println(a.asJson.asYaml.spaces4)
-      printWriter.println("---")
-      printWriter.println(b.asJson.asYaml.spaces4)
-    } finally {
-      printWriter.close()
-    }
-  }
+  override val projectSettings = sbt.inConfig(kube)(Keys.helmSettings)
+}
+
+object Plugin {
+
+  def generate(chart: Chart, file: File) =
+    kubeyml.plugin.writePlan(chart, file, "Chart")
 }

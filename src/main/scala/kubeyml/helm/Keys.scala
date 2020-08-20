@@ -19,46 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package kubeyml.ingress.plugin
+package kubeyml.helm
 
-import kubeyml.ingress._
-import kubeyml.deployment.api._
-import kubeyml.service.plugin.{Keys => ServiceKeys}
-import kubeyml.deployment.plugin.Keys.{kube, gen, application, namespace}
-import kubeyml.protocol.NonEmptyString
+import kubeyml.deployment.plugin.Keys.application
+import kubeyml.deployment.plugin.Keys.{gen, kube}
+import sbt.Def
 import sbt._
 import sbt.Keys._
+import kubeyml.protocol.NonEmptyString
 
-trait Keys {
+object Keys {
 
-  val ingress = settingKey[Ingress]("Kubernetes ingress definition")
-
-  val ingressRules = settingKey[List[Rule]]("Mapping rules from an ingress to a service")
-
-  val ingressName = settingKey[String]("The name of the ingress")
-
-  val ingressAnnotations = settingKey[Map[NonEmptyString, String]]("Set annotations for the ingress metadata")
-
-}
-
-object Keys extends Keys {
-
-  lazy val ingressSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := {
+  lazy val helmSettings: Seq[Def.Setting[_]] = Seq(
+    (target in kube) := (target in kube).value / "templates",
+      gen in kube := {
       (gen in kube).value
-      Plugin.generate(
-        (ServiceKeys.service in kube).value,
-        (Keys.ingress in kube).value,
-        (target in kube).value,
-        (streams.value.log)
+      val chartTarget = (target in kube).value
+      val chart = Chart(
+        NonEmptyString((version in ThisBuild).value),
+        NonEmptyString((application in kube).value)
       )
-    },
-    ingress in kube := CustomIngress(
-      (ingressName in kube).value,
-      (namespace in kube).value,
-      (ingressAnnotations in kube).value,
-      Spec((ingressRules in kube).value)
-    ),
-    (ingressName in kube) := (application in kube).value
+      Plugin.generate(chart, chartTarget.getParentFile)
+    }
   )
 }

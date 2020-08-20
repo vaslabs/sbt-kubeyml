@@ -1,7 +1,7 @@
 ---
 layout: docs
 title:  "Akka Cluster"
-position: 4
+position: 5
 ---
 
 # Akka cluster support

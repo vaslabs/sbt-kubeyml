@@ -49,7 +49,7 @@ object Keys extends Keys {
       Plugin.generate(
         (ServiceKeys.service in kube).value,
         (Keys.ingress in kube).value,
-        (target in ThisProject).value,
+        (target in kube).value,
         (streams.value.log)
       )
     },

@@ -2,7 +2,8 @@ package kubeyml.helm
 
 import io.circe.{Encoder, Json}
 import io.circe.syntax._
-import io.circe.generic.auto._
+import kubeyml.protocol.json_support._
+
 object json_support {
 
   implicit val chartEncoder: Encoder[Chart] = Encoder.instance(

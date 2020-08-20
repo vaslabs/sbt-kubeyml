@@ -7,7 +7,7 @@ position: 4
 
 **This is an experimental feature**
 
-It is possible since 0.4 to generate a helm compatible structure.
+It is possible since 0.3.9 to generate a helm compatible structure.
 
 You have to simply enable HelmPlugin
 

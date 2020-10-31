@@ -35,7 +35,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-yaml" % "0.13.1",
   "org.scalatest" %% "scalatest" % "3.2.2" % Test,
   "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.14.3" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.15.0" % Test,
   "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5" % Test
 )
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.7.6")

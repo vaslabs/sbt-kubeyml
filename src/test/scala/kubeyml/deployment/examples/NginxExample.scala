@@ -26,10 +26,11 @@ import kubeyml.deployment.api._
 import scala.concurrent.duration._
 import io.circe.yaml.syntax._
 import io.circe.syntax._
-import kubeyml.ingress.{CustomIngress, Host, HttpRule, Ingress, ServiceMapping, Path => IngressPath, Spec => IngressSpec}
+import kubeyml.ingress.{CustomIngress, HttpRule, Ingress, ServiceMapping, Path => IngressPath, Spec => IngressSpec}
 import kubeyml.ingress.api.Annotate
 import kubeyml.service.Service
 import kubeyml.ingress.json_support._
+import kubeyml.protocol.Host
 
 object NginxExample extends App {
 

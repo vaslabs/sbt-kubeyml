@@ -33,4 +33,7 @@ object json_support {
   implicit val portNumberEncoder: Encoder[PortNumber] =
     Encoder.encodeInt.contramap(_.value)
 
+  implicit val hostEncoder: Encoder[Host] = Encoder.encodeString.contramap(_.value)
+
+  implicit val ipEncoder: Encoder[IPv4] = Encoder.encodeString.contramap(_.show)
 }

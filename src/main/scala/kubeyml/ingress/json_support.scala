@@ -34,6 +34,8 @@ object json_support {
 
   implicit val apiVersionEncoder: Encoder[ApiVersion] = Encoder.instance(_.show.asJson)
 
+  implicit val hostEncoder: Encoder[Host] = Encoder.encodeString.contramap(_.value)
+
   implicit val pathEncoder: Encoder[Path] = Encoder.instance {
     case Path(ServiceMapping(serviceName, servicePort), path) =>
       Json.obj(

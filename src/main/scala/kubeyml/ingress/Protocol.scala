@@ -21,7 +21,7 @@
 
 package kubeyml.ingress
 
-import kubeyml.protocol.{Host, NonEmptyString, PortNumber}
+import kubeyml.protocol.{NonEmptyString, PortNumber}
 
 sealed trait Ingress
 
@@ -57,6 +57,19 @@ case object NetworkingV1Beta1 extends ApiVersion {
 case class Spec(rules: List[Rule])
 
 sealed trait Rule
+
+case class Host(value: String) {
+  private val validationRegex = "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
+  private def errorMessage = s""""
+    Invalid value: ${value}:
+    a DNS-1123 subdomain must consist of lower case alphanumeric characters, '-' or '.',
+    and must start and end with an alphanumeric character
+    (e.g. 'example.com', regex used for validation is
+    '${validationRegex}')
+  """
+  require(value.nonEmpty, "Hostname cannot be empty")
+  require(value.matches(s"${validationRegex}"), errorMessage)
+}
 
 case class HttpRule(host: Host, paths: List[Path]) extends Rule
 

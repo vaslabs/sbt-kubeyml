@@ -131,20 +131,4 @@ object json_support {
       case (name, value) => EnvVarDefinition(name.value, value)
     })
 
-  implicit val templateSpecEncoder: Encoder[TemplateSpec] = Encoder.instance(
-    ts =>
-      Json.obj(
-        Seq(
-          "containers" -> ts.containers.asJson
-        ) ++ addIfNonEmpty(ts.hostAliases, "hostAliases"): _*
-      )
-  )
-
-  private def addIfNonEmpty(aliases: List[HostAlias], key: String): Seq[(String, Json)] =
-    if (aliases.isEmpty)
-      Seq.empty
-    else
-      Seq(
-        key -> aliases.asJson
-      )
 }

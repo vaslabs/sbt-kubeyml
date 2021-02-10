@@ -21,7 +21,7 @@
 
 package kubeyml.deployment
 
-import kubeyml.protocol.{Host, IPv4, NonEmptyString, PortNumber}
+import kubeyml.protocol.{NonEmptyString, PortNumber}
 
 import scala.concurrent.duration._
 
@@ -157,9 +157,7 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
 case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
 
-case class HostAlias(ip: IPv4, hostnames: List[Host])
-
-case class TemplateSpec(containers: List[Container], hostAliases: List[HostAlias]) {
+case class TemplateSpec(containers: List[Container]) {
 
   private[deployment] def addContainerPorts(ports: List[Port]): TemplateSpec =
     this.copy(containers = containers.map { container =>

@@ -21,44 +21,10 @@
 
 package kubeyml.protocol
 
-import java.net.InetAddress
-import java.nio.ByteBuffer
-
 case class NonEmptyString(value: String) {
   require(value.nonEmpty, "Empty strings are not allowed")
 }
 
 case class PortNumber(value: Int) {
   require(value >= 0 && value <= 65535, "Out of port range [0,65535]")
-}
-
-case class IPv4 private (value: Int) {
-  val show: String =
-    InetAddress.getByAddress(
-      ByteBuffer.allocate(4)
-        .putInt(value).array()
-    ).getHostAddress
-}
-
-object IPv4 {
-  def apply(str: String): IPv4 =
-    apply(
-      ByteBuffer.wrap(InetAddress.getByName(str).getAddress).getInt
-    )
-
-  private def apply(value: Int): IPv4 = new IPv4(value)
-}
-
-
-case class Host(value: String) {
-  private val validationRegex = "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"
-  private def errorMessage = s""""
-    Invalid value: ${value}:
-    a DNS-1123 subdomain must consist of lower case alphanumeric characters, '-' or '.',
-    and must start and end with an alphanumeric character
-    (e.g. 'example.com', regex used for validation is
-    '${validationRegex}')
-  """
-  require(value.nonEmpty, "Hostname cannot be empty")
-  require(value.matches(s"${validationRegex}"), errorMessage)
 }

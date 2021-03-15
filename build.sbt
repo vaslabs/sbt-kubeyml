@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.15.3" % Test,
   "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5" % Test
 )
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 
 lazy val pluginSettings = Seq(
   sbtPlugin := true

@@ -26,7 +26,7 @@ lazy val site = (project in file("site"))
 
 crossScalaVersions := Seq(scala212)
 
-val circeVersion = "0.13.0"
+val circeVersion = "0.14.1"
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 
 libraryDependencies ++= Seq(

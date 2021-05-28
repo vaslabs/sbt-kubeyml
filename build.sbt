@@ -3,9 +3,9 @@ import xerial.sbt.Sonatype.GitHubHosting
 
 name := "sbt-kubeyml"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.12.14"
 
-lazy val scala212 = "2.12.10"
+lazy val scala212 = "2.12.14"
 
 lazy val `kubeyml` = (project in file("."))
   .enablePlugins(AutomateHeaderPlugin, SbtPlugin)

@@ -26,17 +26,17 @@ lazy val site = (project in file("site"))
 
 crossScalaVersions := Seq(scala212)
 
-val circeVersion = "0.13.0"
+val circeVersion = "0.14.1"
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
-  "io.circe" %% "circe-yaml" % "0.13.1",
-  "org.scalatest" %% "scalatest" % "3.2.9" % Test,
+  "io.circe" %% "circe-yaml" % "0.14.0",
+  "org.scalatest" %% "scalatest" % "3.2.8" % Test,
   "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
   "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.5" % Test
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0" % Test
 )
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.8.1")
 

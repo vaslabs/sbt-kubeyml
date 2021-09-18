@@ -59,20 +59,20 @@ trait Keys {
 object Keys extends Keys {
 
   lazy val deploymentSettings: Seq[Def.Setting[_]] = Seq(
-    (target in kube) := (target in ThisProject).value / "kubeyml",
-    gen in kube :=
+    (kube / target) := (ThisProject / target).value / "kubeyml",
+    kube / gen :=
       Plugin.generate(
-        (deployment in kube).value,
-        (target in kube).value
+        (kube / deployment).value,
+        (kube / target).value
       ),
-    namespace := (name in ThisProject).value,
-    application := (name in ThisProject).value,
+    namespace := (ThisProject / name).value,
+    application := (ThisProject / name).value,
     dockerImage := (dockerAlias).value.toString(),
     ports := dockerExposedPorts.value.toList.map(Port(None, _)),
     livenessProbe := HttpProbe(
       HttpGet("/health", 8080, List.empty)
     ),
-    readinessProbe := (livenessProbe in kube).value,
+    readinessProbe := (kube / livenessProbe).value,
     annotations := Map.empty,
     replicas := 2,
     envs := Map.empty,
@@ -99,5 +99,5 @@ object Keys extends Keys {
         .pullPolicy(kubeSetting(imagePullPolicy).value)
   )
 
-  private def kubeSetting[A](setting: SettingKey[A]): SettingKey[A] = (setting in kube)
+  private def kubeSetting[A](setting: SettingKey[A]): SettingKey[A] = (kube / setting)
 }

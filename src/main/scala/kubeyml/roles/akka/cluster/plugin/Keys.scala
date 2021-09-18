@@ -41,20 +41,20 @@ trait Keys {
 
 object Keys extends Keys {
   lazy val akkaClusterSettings: Seq[Def.Setting[_]] = Seq(
-    discoveryMethodEnv in kube := None,
-    hostnameEnv in kube := None,
-    namespaceEnv in kube := None,
-    livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
-    readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
-    (envs in kube) ++=
+    kube / discoveryMethodEnv := None,
+    kube / hostnameEnv := None,
+    kube / namespaceEnv := None,
+    kube / livenessProbe := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+    kube / readinessProbe := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+    (envs) ++=
       Map(List(
-          (discoveryMethodEnv in kube).value.map(_ -> EnvRawValue("kubernetes-api")),
-          (hostnameEnv in kube).value.map(_ -> EnvFieldValue("status.podIP")),
-          (namespaceEnv in kube).value.map(_ -> EnvFieldValue("metadata.namespace"))
+          (kube / discoveryMethodEnv).value.map(_ -> EnvRawValue("kubernetes-api")),
+          (kube / hostnameEnv).value.map(_ -> EnvFieldValue("status.podIP")),
+          (kube / namespaceEnv).value.map(_ -> EnvFieldValue("metadata.namespace"))
         ).flatten: _*) ++ Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") -> EnvFieldValue("metadata.labels['app']")),
-    gen in kube := {
-      (gen in kube).value
-      val namespace = (DeploymentKeys.namespace in kube).value
+    gen := {
+      (kube / gen).value
+      val namespace = (kube / DeploymentKeys.namespace).value
       val role = Role(
         RoleMetadata(
           "pod-reader",
@@ -69,7 +69,7 @@ object Keys extends Keys {
           Essential.subjects(namespace),
           RoleRef(role)
         ),
-        (target in kube).value
+        (kube / target).value
       )
     }
   )

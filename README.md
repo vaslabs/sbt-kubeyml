@@ -65,19 +65,19 @@ lazy val secretsName = sys.env.getOrElse("SECRETS_NAME", "myservice-test-secrets
 lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https://localhost:8080")
 
 lazy val deploymentSettings = Seq(
-  namespace in kube := "my-namespace", //default is name in thisProject
-  application in kube := deploymentName, //default is name in thisProject
-  command in kube := Some("webserver"),
-  args in kube := Seq("-c","/path/to/config"),
-  envs in kube := Map(
+  kube / namespace := "my-namespace", //default is name in thisProject
+  kube / application := deploymentName, //default is name in thisProject
+  kube / command := Some("webserver"),
+  kube / args := Seq("-c","/path/to/config"),
+  kube / envs := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
-  resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests in kube := Resource(Cpu(500), Memory(512)),
+  kube / resourceLimits := Resource(Cpu.fromCores(2), Memory(2048+512)),
+  kube / resourceRequests := Resource(Cpu(500), Memory(512)),
   //if you want you can use something like the below to modify any part of the deployment by hand
-  deployment in kube := (deployment in kube).value.pullDockerImage(IfNotPresent)
+  kube / deployment := (deployment in kube).value.pullDockerImage(IfNotPresent)
 )
 ```
 
@@ -201,13 +201,13 @@ lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomai
   import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
   
   val ingressSettings = Seq(
-      (ingressName in kube) := ingressEnvName,
-      (ingressRules in kube) := List(
+      (kube / ingressName) := ingressEnvName,
+      (kube / ingressRules) := List(
         HttpRule(Host(hostName), List(
-          IngressPath(ServiceMapping((service in kube).value.name, 8085), "/hello-world")
+          IngressPath(ServiceMapping((kube / service).value.name, 8085), "/hello-world")
         ))
       ),
-      (ingressAnnotations in kube) := Map(
+      (kube / ingressAnnotations) := Map(
         Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
         Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
         NonEmptyString("your-own-annotation-key") -> "value"

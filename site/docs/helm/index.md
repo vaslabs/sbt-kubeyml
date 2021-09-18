@@ -31,7 +31,7 @@ you can override the setting.
 
 
 ```scala
-(target in kube) := ".deployment/templates"
+(kube / target) := ".deployment/templates"
 ```
 
 Remember that if you override the target you need to point to a templates directory

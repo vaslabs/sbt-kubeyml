@@ -22,22 +22,23 @@ lazy val ingressEnvName = sys.env.getOrElse("HELLO_INGRESS_NAME", "helloworld-in
 lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomain.smth")
 
   import kubeyml.protocol.NonEmptyString
+  import kubeyml.protocol.Host
   import kubeyml.deployment.plugin.Keys._
   import kubeyml.ingress.api._
   import kubeyml.ingress.plugin.Keys._
   import kubeyml.service.plugin.Keys._
 
   import kubeyml.ingress.plugin.Keys._
-  import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
+  import kubeyml.ingress.{HttpRule, ServiceMapping, Path => IngressPath}
   
   val ingressSettings = Seq(
-      (ingressName in kube) := ingressEnvName,
-      (ingressRules in kube) := List(
+      (kube / ingressName) := ingressEnvName,
+      (kube / ingressRules) := List(
         HttpRule(Host(hostName), List(
-          IngressPath(ServiceMapping((service in kube).value.name, 8085), "/hello-world")
+          IngressPath(ServiceMapping((kube / service).value.name, 8085), "/hello-world")
         ))
       ),
-      (ingressAnnotations in kube) := Map(
+      (kube / ingressAnnotations) := Map(
         Annotate.nginxIngress(), // this adds kubernetes.io/ingress.class: nginx
         Annotate.nginxRewriteTarget("/hello-world"), //this adds nginx.ingress.kubernetes.io/rewrite-target: /hello-world
         NonEmptyString("your-own-annotation-key") -> "value"

@@ -20,17 +20,17 @@ lazy val secretsName = sys.env.getOrElse("SECRETS_NAME", "myservice-test-secrets
 lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "http://another-service.another-namespace:8080")
 
 lazy val deploymentSettings = Seq(
-  namespace in kube := "my-namespace", //default is name in thisProject
-  application in kube := deploymentName, //default is name in thisProject
-  envs in kube := Map(
+  kube / namespace := "my-namespace", //default is name in thisProject
+  kube / application := deploymentName, //default is name in thisProject
+  kube / envs := Map(
     EnvName("JAVA_OPTS") -> EnvRawValue("-Xms256M -Xmx2048M"),
     EnvName("MY_DEPENDENCY_SERVICE") -> EnvRawValue(serviceDependencyConnection),
     EnvName("MY_SECRET_TOKEN") -> EnvSecretValue(name = secretsName, key = "my-token")
   ),
-  resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048+512)),
-  resourceRequests in kube := Resource(Cpu(500), Memory(512)),
+  kube / resourceLimits := Resource(Cpu.fromCores(2), Memory(2048+512)),
+  kube / resourceRequests := Resource(Cpu(500), Memory(512)),
   //if you want you can use something like the below to modify any part of the deployment by hand
-  deployment in kube := (deployment in kube).value.pullDockerImage(IfNotPresent)
+  kube / deployment:= (kube / deployment).value.pullDockerImage(IfNotPresent)
 )
 ```
 

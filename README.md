@@ -65,8 +65,8 @@ lazy val secretsName = sys.env.getOrElse("SECRETS_NAME", "myservice-test-secrets
 lazy val serviceDependencyConnection = sys.env.getOrElse("MY_DEPENDENCY", "https://localhost:8080")
 
 lazy val deploymentSettings = Seq(
-  kube / namespace := "my-namespace", //default is name in thisProject
-  kube / application := deploymentName, //default is name in thisProject
+  kube / namespace := "my-namespace", //default is ThisProject / name 
+  kube / application := deploymentName, //default is ThisProject / name
   kube / command := Some("webserver"),
   kube / args := Seq("-c","/path/to/config"),
   kube / envs := Map(
@@ -77,7 +77,7 @@ lazy val deploymentSettings = Seq(
   kube / resourceLimits := Resource(Cpu.fromCores(2), Memory(2048+512)),
   kube / resourceRequests := Resource(Cpu(500), Memory(512)),
   //if you want you can use something like the below to modify any part of the deployment by hand
-  kube / deployment := (deployment in kube).value.pullDockerImage(IfNotPresent)
+  kube / deployment := (kube / deployment).value.pullDockerImage(IfNotPresent)
 )
 ```
 
@@ -192,13 +192,13 @@ lazy val hostName = sys.env.getOrElse("YOUR_HOST_NAME", "your-hostname.yourdomai
 3. Configure the plugin
 
 ```scala
-  import kubeyml.protocol.NonEmptyString
+  import kubeyml.protocol.{NonEmptyString, Host}
   import kubeyml.deployment.plugin.Keys._
   import kubeyml.ingress.api._
 
   import kubeyml.ingress.plugin.Keys._
   import kubeyml.service.plugin.Keys._
-  import kubeyml.ingress.{Host, HttpRule, ServiceMapping, Path => IngressPath}
+  import kubeyml.ingress.{HttpRule, ServiceMapping, Path => IngressPath}
   
   val ingressSettings = Seq(
       (kube / ingressName) := ingressEnvName,

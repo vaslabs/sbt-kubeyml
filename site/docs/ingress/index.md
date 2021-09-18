@@ -13,7 +13,8 @@ If we continue with our nginx example from the [service](service) section, the i
 
 ```scala mdoc:silent
 
-import kubeyml.ingress.{CustomIngress, Host, HttpRule, Ingress, ServiceMapping, Path => IngressPath, Spec => IngressSpec}
+import kubeyml.protocol.Host
+import kubeyml.ingress.{CustomIngress, HttpRule, Ingress, ServiceMapping, Path => IngressPath, Spec => IngressSpec}
 import kubeyml.ingress.api.Annotate
 
 import kubeyml.deployment.{HttpProbe, IfNotPresent, HttpGet, Port => DeployPort}

@@ -140,14 +140,14 @@ lazy val docSettings = Seq(
       Map("section" -> "home", "position" -> "0", "permalink" -> "/")
     )
   ),
-  excludeFilter in ghpagesCleanSite :=
+  ghpagesCleanSite / excludeFilter :=
     new FileFilter{
       def accept(f: File) = (ghpagesRepository.value / "CNAME").getCanonicalPath == f.getCanonicalPath
     } || "versions.html"
 )
 lazy val noPublishSettings =
   Seq(
-    skip in publish := true,
+    publish / skip := true,
     publish := (()),
     publishLocal := (()),
     publishArtifact := false,

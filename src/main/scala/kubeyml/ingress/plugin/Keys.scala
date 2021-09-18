@@ -44,21 +44,21 @@ trait Keys {
 object Keys extends Keys {
 
   lazy val ingressSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := {
-      (gen in kube).value
+    kube / gen := {
+      (kube / gen).value
       Plugin.generate(
-        (ServiceKeys.service in kube).value,
-        (Keys.ingress in kube).value,
-        (target in kube).value,
+        (kube / ServiceKeys.service).value,
+        (kube / Keys.ingress).value,
+        (kube / target).value,
         (streams.value.log)
       )
     },
-    ingress in kube := CustomIngress(
-      (ingressName in kube).value,
-      (namespace in kube).value,
-      (ingressAnnotations in kube).value,
-      Spec((ingressRules in kube).value)
+    kube / ingress := CustomIngress(
+      (kube / ingressName).value,
+      (kube / namespace).value,
+      (kube / ingressAnnotations).value,
+      Spec((kube / ingressRules).value)
     ),
-    (ingressName in kube) := (application in kube).value
+    (kube / ingressName) := (kube / application).value
   )
 }

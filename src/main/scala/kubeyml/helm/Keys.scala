@@ -31,13 +31,13 @@ import kubeyml.protocol.NonEmptyString
 object Keys {
 
   lazy val helmSettings: Seq[Def.Setting[_]] = Seq(
-    (target in kube) := (target in kube).value / "templates",
-      gen in kube := {
-      (gen in kube).value
-      val chartTarget = (target in kube).value
+    (kube / target) := (kube / target).value / "templates",
+    kube / gen := {
+      (kube / gen).value
+      val chartTarget = (kube / target).value
       val chart = Chart(
-        NonEmptyString((version in ThisBuild).value),
-        NonEmptyString((application in kube).value)
+        NonEmptyString((ThisBuild / version).value),
+        NonEmptyString((kube / application).value)
       )
       Plugin.generate(chart, chartTarget.getParentFile)
     }

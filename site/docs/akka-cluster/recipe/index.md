@@ -56,26 +56,26 @@ import kubeyml.deployment.plugin.Keys._
 import kubeyml.roles.akka.cluster.plugin.Keys._
 
 lazy val akkaClusterKubernetesSettings = Seq(
-  hostnameEnv in kube := Some(EnvName("MY_HOSTNAME")),
-  namespaceEnv in kube := Some(EnvName("MY_NAMESPACE"))
+  kube / hostnameEnv := Some(EnvName("MY_HOSTNAME")),
+  kube / namespaceEnv := Some(EnvName("MY_NAMESPACE"))
 )
 
 lazy val deploymentSettings = Seq(
-  namespace in kube := "my-namespace",
-  application in kube := "my-application",
-  envs in kube ++= Map(
+  kube / namespace := "my-namespace",
+  kube / application := "my-application",
+  kube / envs ++= Map(
     EnvName("ANOTHER_ENV") -> EnvRawValue("something")
   ),
-  resourceRequests in kube := Resource(Cpu.fromCores(1), Memory(512)),
-  resourceLimits in kube := Resource(Cpu.fromCores(2), Memory(2048 + 256))
+  kube / resourceRequests := Resource(Cpu.fromCores(1), Memory(512)),
+   kube / resourceLimits := Resource(Cpu.fromCores(2), Memory(2048 + 256))
 )
 ```
 
 Notice that you don't need to specify the liveness probe and the readiness probe. The `AkkaClusterPlugin` 
 configures the following probes:
 ```scala
-livenessProbe in kube := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
-readinessProbe in kube := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+kube / livenessProbe := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
+kube / readinessProbe := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
 ```
 
 The plugin only depends on the deployment plugin. If you need this exposed via an ingress you need to configure that yourself.

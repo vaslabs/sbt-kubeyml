@@ -39,15 +39,15 @@ trait Keys {
 object Keys extends Keys {
 
   lazy val serviceSettings: Seq[Def.Setting[_]] = Seq(
-    gen in kube := {
-      (gen in kube).value
+    kube / gen := {
+      (kube / gen).value
       Plugin.generate(
-        (Keys.service in kube).value,
-        (target in kube).value
+        (kube / Keys.service).value,
+        (kube / target).value
       )
     },
-    (service in kube) := Service.fromDeployment(
-      (deployment in kube).value
+    (kube / service) := Service.fromDeployment(
+      (kube / deployment).value
     )
   )
 }

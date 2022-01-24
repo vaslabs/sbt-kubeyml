@@ -33,7 +33,7 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-yaml" % "0.14.1",
-  "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.11" % Test,
   "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
   "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
   "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0" % Test

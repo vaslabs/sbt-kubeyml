@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Vasilis Nicolaou
+ * Copyright (c) 2019 Spravy
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -29,9 +29,9 @@ import io.circe.yaml.syntax._
 
 package object plugin {
 
-  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]) = {
+  private[kubeyml] def writePlan[A](a: A, buildTarget: File, kind: String)(implicit encoder: Encoder[A]): Unit = {
     buildTarget.mkdirs()
-    val file = new File(buildTarget, s"${kind}.yml")
+    val file = new File(buildTarget, s"$kind.yml")
     val printWriter = new PrintWriter(file)
     try {
       printWriter.println(a.asJson.asYaml.spaces4)
@@ -41,8 +41,9 @@ package object plugin {
   }
 
   private[kubeyml] def writePlansInSingle[A, B](a: A, b: B, buildTarget: File, kind: String)(implicit
-                                              encoderA: Encoder[A], encoder: Encoder[B]
-  ) = {
+    encoderA: Encoder[A],
+    encoder: Encoder[B]
+  ): Unit = {
     buildTarget.mkdirs()
     val file = new File(buildTarget, s"${kind}.yml")
     val printWriter = new PrintWriter(file)

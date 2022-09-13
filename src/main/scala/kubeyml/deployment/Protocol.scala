@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Vasilis Nicolaou
+ * Copyright (c) 2019 Spravy
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -42,6 +42,9 @@ case class Deployment(
   private[kubeyml] def addEnv(envs: Map[EnvName, EnvValue]): Deployment =
     this.copy(spec = spec.addContainerEnvs(envs))
 
+  private[kubeyml] def addPersistentVolumes(volumes: Seq[VolumeWithClaim]): Deployment =
+    this.copy(spec = spec.addPersistentVolumes(volumes))
+
   private[kubeyml] def addCommand(cmd: Option[NonEmptyString], args: Seq[String]): Deployment = {
     this.copy(spec = spec.addContainerCmd(cmd, args))
   }
@@ -60,7 +63,6 @@ case class Deployment(
 
   private[kubeyml] def withDeploymentStrategy(deploymentStrategy: DeploymentStrategy): Deployment =
     this.copy(spec = spec.withDeploymentStrategy(deploymentStrategy))
-
 
 }
 
@@ -87,6 +89,9 @@ case class Spec(
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Spec =
     this.copy(template = template.addContainerEnvs(envs))
 
+  private[deployment] def addPersistentVolumes(volumes: Seq[VolumeWithClaim]): Spec =
+    this.copy(template = template.addPersistentVolumes(volumes))
+
   private[deployment] def addContainerCmd(command: Option[NonEmptyString], args: Seq[String]): Spec =
     this.copy(template = template.addContainerCmd(command, args))
 
@@ -104,7 +109,6 @@ case class Spec(
 
   private[deployment] def withDeploymentStrategy(deploymentStrategy: DeploymentStrategy): Spec =
     this.copy(strategy = deploymentStrategy)
-
 
 }
 
@@ -129,8 +133,8 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
     this.copy(spec = spec.addContainerPorts(ports))
 
   private[deployment] def annotate(annotations: Map[String, String]): Template = {
-    require(annotations.forall {
-      case (key, value) => key.nonEmpty && value.nonEmpty
+    require(annotations.forall { case (key, value) =>
+      key.nonEmpty && value.nonEmpty
     })
     this.copy(metadata = metadata.copy(annotations = annotations))
   }
@@ -140,6 +144,9 @@ case class Template(metadata: TemplateMetadata, spec: TemplateSpec) {
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): Template =
     this.copy(spec = spec.addContainerEnvs(envs))
+
+  private[deployment] def addPersistentVolumes(volumes: Seq[VolumeWithClaim]): Template =
+    this.copy(spec = spec.addPersistentVolumes(volumes))
 
   private[deployment] def requestResource(resource: Resource): Template =
     this.copy(spec = spec.requestResource(resource))
@@ -159,7 +166,7 @@ case class TemplateMetadata(labels: Labels, annotations: Map[String, String])
 
 case class HostAlias(ip: IPv4, hostnames: List[Host])
 
-case class TemplateSpec(containers: List[Container], hostAliases: List[HostAlias]) {
+case class TemplateSpec(containers: List[Container], volumes: List[Volume], hostAliases: List[HostAlias]) {
 
   private[deployment] def addContainerPorts(ports: List[Port]): TemplateSpec =
     this.copy(containers = containers.map { container =>
@@ -171,6 +178,12 @@ case class TemplateSpec(containers: List[Container], hostAliases: List[HostAlias
 
   private[deployment] def addContainerEnvs(envs: Map[EnvName, EnvValue]): TemplateSpec =
     this.copy(containers = containers.map(_.addEnvs(envs)))
+
+  private[deployment] def addPersistentVolumes(volumesWithClaim: Seq[VolumeWithClaim]): TemplateSpec =
+    this.copy(
+      containers = containers.map(_.withVolumeMounts(volumesWithClaim.map(vwc => VolumeMount(vwc.mountPath, vwc.name)))),
+      volumes = volumesWithClaim.map(vwc => Volume(vwc.name, PersistentVolumeClaim(vwc.claimName))).toList
+    )
 
   private[deployment] def requestResource(resource: Resource): TemplateSpec =
     this.copy(containers = containers.map(_.requestResource(resource)))
@@ -196,6 +209,7 @@ case class Container(
   livenessProbe: Probe,
   readinessProbe: Probe,
   env: Map[EnvName, EnvValue],
+  volumeMounts: Seq[VolumeMount],
   resources: Resources = Resources()
 ) {
 
@@ -218,6 +232,9 @@ case class Container(
 
   private[deployment] def withResources(limits: Resource, requests: Resource): Container =
     this.copy(resources = resources.copy(limits = limits, requests = requests))
+
+  private[deployment] def withVolumeMounts(volumeMounts: Seq[VolumeMount]): Container =
+    this.copy(volumeMounts = volumeMounts)
 
 }
 
@@ -246,6 +263,13 @@ object Cpu {
 case class Memory(value: Int) {
   require(value > 0)
 }
+
+case class VolumeWithClaim(name: String, claimName: String, mountPath: String)
+
+case class VolumeMount(mountPath: String, name: String)
+
+case class PersistentVolumeClaim(claimName: String)
+case class Volume(name: String, persistentVolumeClaim: PersistentVolumeClaim)
 
 case class EnvName(value: NonEmptyString)
 sealed trait EnvValue

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Vasilis Nicolaou
+ * Copyright (c) 2019 Spravy
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -42,11 +42,11 @@ object json_support {
 
   implicit val deploymentStrategyEncoder: Encoder[DeploymentStrategy] = Encoder.instance {
     case r: RollingUpdate => rollingUpdateEncoder.apply(r)
-    case Recreate => Json.obj("type" -> "Recreate".asJson)
+    case Recreate         => Json.obj("type" -> "Recreate".asJson)
   }
 
-  implicit val containerCmdEncoder: Encoder[Command] = Encoder.instance {
-    case Command(cmd) => Seq(cmd).asJson
+  implicit val containerCmdEncoder: Encoder[Command] = Encoder.instance { case Command(cmd) =>
+    Seq(cmd).asJson
   }
 
   implicit val imagePullPolicyEncoder: Encoder[ImagePullPolicy] = Encoder.instance {
@@ -127,20 +127,20 @@ object json_support {
 
   implicit val environmentVariablesEncoder: Encoder[Map[EnvName, EnvValue]] = Encoder
     .encodeList[EnvVarDefinition]
-    .contramap(_.toList.map {
-      case (name, value) => EnvVarDefinition(name.value, value)
+    .contramap(_.toList.map { case (name, value) =>
+      EnvVarDefinition(name.value, value)
     })
 
-  implicit val templateSpecEncoder: Encoder[TemplateSpec] = Encoder.instance(
-    ts =>
-      Json.obj(
-        Seq(
-          "containers" -> ts.containers.asJson
-        ) ++ addIfNonEmpty(ts.hostAliases, "hostAliases"): _*
-      )
+  implicit val templateSpecEncoder: Encoder[TemplateSpec] = Encoder.instance(ts =>
+    Json.obj(
+      Seq(
+        "containers" -> ts.containers.asJson,
+        "volumes" -> ts.volumes.asJson
+      ) ++ (addIfNonEmpty(ts.hostAliases, "hostAliases") ++ addIfNonEmpty(ts.volumes, "volumes")): _*
+    )
   )
 
-  private def addIfNonEmpty(aliases: List[HostAlias], key: String): Seq[(String, Json)] =
+  private def addIfNonEmpty[A](aliases: List[A], key: String)(implicit encoder: Encoder[A]): Seq[(String, Json)] =
     if (aliases.isEmpty)
       Seq.empty
     else

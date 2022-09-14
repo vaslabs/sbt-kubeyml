@@ -38,7 +38,7 @@ libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
   "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0" % Test
 )
-addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.11")
+addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.9")
 
 lazy val pluginSettings = Seq(
   sbtPlugin := true
@@ -49,8 +49,8 @@ lazy val publishSettings = Seq(
     if (isSnapshot.value) Opts.resolver.sonatypeSnapshots
     else Opts.resolver.sonatypeStaging
   ),
-  organization := "org.spravy",
-  organizationName := "Spravy",
+  organization := "org.vaslabs.kube",
+  organizationName := "Vasilis Nicolaou",
   sonatypeProfileName := "org.vaslabs",
   sonatypeProjectHosting := Some(GitHubHosting("vaslabs", "sbt-kubeyml", "vaslabsco@gmail.com")),
   scmInfo := Some(ScmInfo(url("https://github.com/vaslabs/sbt-kubeyml"), "scm:git@github.com:vaslabs/sbt-kubeyml.git")),

@@ -8,7 +8,7 @@
 
 <p>Then your gitlab publish template will look like (example extended from <a href="/deployment/recipe">deployment recipe</a>)</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.publish-template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">.publish-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">publish-image</span>
   <span class="na">script</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
@@ -20,7 +20,7 @@
         <span class="pi">-</span> <span class="s">target/kubeyml/service.yml</span>
 </code></pre></div></div>
 <p>And deploy with</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.deploy-template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">.deploy-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">deploy</span>
   <span class="na">image</span><span class="pi">:</span> <span class="s">docker-image-that-has-your-kubectl-config</span>
   <span class="na">script</span><span class="pi">:</span>

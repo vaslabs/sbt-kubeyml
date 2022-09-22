@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><title>sbt-kubeyml</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Vasilis Nicolaou" /><meta name="description" content="Autogenerate kubernetes manifests for your scala application" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="sbt-kubeyml" /><meta name="title" property="og:title" content="sbt-kubeyml" /><meta name="og:site_name" content="sbt-kubeyml" /><meta name="og:url" content="" /><meta name="og:type" content="website" /><meta name="og:description" content="Autogenerate kubernetes manifests for your scala application" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="sbt-kubeyml" /><meta name="twitter:image" content="https://sbt-kubeyml.vaslabs.org/img/poster.png" /><meta name="twitter:description" content="Autogenerate kubernetes manifests for your scala application" /><meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@vaslabs" /><meta name="twitter:creator" content="@vaslabs" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/vs.css" /><link rel="stylesheet" href="/css/light-style.css" /><link rel="stylesheet" href="/css/home.css" /></head><body class="home"><nav id="navigation" aria-labelledby="main-navigation"><div class="navbar-wrapper container"><div class="navigation-brand"><a href="/" class="brand custom-feature-icon"><div class="icon-wrapper"></div><span class="brand-title">sbt-kubeyml</span></a></div><div class="navigation-menu"><ul><li class="search-nav"><div id="search-dropdown"><label><i class="fa fa-search"></i>Search</label><input id="search-bar" type="text" placeholder="Enter keywords here..." onclick="displayToggleSearch(event)" /><ul id="search-dropdown-content" class="dropdown dropdown-content"></ul></div></li><li><a href="https://github.com/vaslabs/sbt-kubeyml" target="_blank" rel="noopener noreferrer"><i class="nav-item-icon fa fa-lg fa-github" hidden="true"></i><span class="nav-item-text">GitHub</span></a></li></ul></div></div></nav><header id="masthead"><div class="container text-center"><h1 class="masthead-description">Autogenerate kubernetes manifests for your scala application</h1><a href="https://github.com/vaslabs/sbt-kubeyml" target="_blank" rel="noopener noreferrer" class="masthead-button">View on GitHub</a></div></header><nav class="menu-container" aria-labelledby="section-navigation"><div id="horizontal-menu"><ul class="horizontal-nav"><li><a class=" active " href="/"></a></li><li><a class="" href="/deployment/">Deployment manifest</a></li><li><a class="" href="/service/">Service manifest</a></li><li><a class="" href="/ingress/">Ingress manifest</a></li><li><a class="" href="/helm/">Helm Support</a></li><li><a class="" href="/akka-cluster/">Akka Cluster</a></li></ul></div></nav><main id="site-main"><section class="main-content"><div class="container"><div id="content"><h1 id="sbt-kubeyml">sbt-kubeyml</h1>
-<p><a href="https://www.codacy.com/manual/vaslabs/sbt-kubeyml?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vaslabs/sbt-kubeyml&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/1a2b9682f101488cb8bf5589e5bd7310" alt="Codacy Badge" /></a> <a href="https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master"><img src="https://circleci.com/gh/vaslabs/sbt-kubeyml/tree/master.svg?style=svg" alt="CircleCI" /></a> <a href="https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml"><img src="https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg" alt="Maven Central" /></a> <a href="https://scala-steward.org"><img src="https://img.shields.io/badge/Scala_Steward-helping-blue.svg?style=flat&amp;logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAMAAAARSr4IAAAAVFBMVEUAAACHjojlOy5NWlrKzcYRKjGFjIbp293YycuLa3pYY2LSqql4f3pCUFTgSjNodYRmcXUsPD/NTTbjRS+2jomhgnzNc223cGvZS0HaSD0XLjbaSjElhIr+AAAAAXRSTlMAQObYZgAAAHlJREFUCNdNyosOwyAIhWHAQS1Vt7a77/3fcxxdmv0xwmckutAR1nkm4ggbyEcg/wWmlGLDAA3oL50xi6fk5ffZ3E2E3QfZDCcCN2YtbEWZt+Drc6u6rlqv7Uk0LdKqqr5rk2UCRXOk0vmQKGfc94nOJyQjouF9H/wCc9gECEYfONoAAAAASUVORK5CYII=" alt="Scala Steward badge" /></a></p>
+<p><a href="https://www.codacy.com/manual/vaslabs/sbt-kubeyml?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vaslabs/sbt-kubeyml&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/1a2b9682f101488cb8bf5589e5bd7310" alt="Codacy Badge" /></a> <a href="https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml"><img src="https://maven-badges.herokuapp.com/maven-central/org.vaslabs.kube/sbt-kubeyml/badge.svg" alt="Maven Central" /></a> <a href="https://scala-steward.org"><img src="https://img.shields.io/badge/Scala_Steward-helping-blue.svg?style=flat&amp;logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAMAAAARSr4IAAAAVFBMVEUAAACHjojlOy5NWlrKzcYRKjGFjIbp293YycuLa3pYY2LSqql4f3pCUFTgSjNodYRmcXUsPD/NTTbjRS+2jomhgnzNc223cGvZS0HaSD0XLjbaSjElhIr+AAAAAXRSTlMAQObYZgAAAHlJREFUCNdNyosOwyAIhWHAQS1Vt7a77/3fcxxdmv0xwmckutAR1nkm4ggbyEcg/wWmlGLDAA3oL50xi6fk5ffZ3E2E3QfZDCcCN2YtbEWZt+Drc6u6rlqv7Uk0LdKqqr5rk2UCRXOk0vmQKGfc94nOJyQjouF9H/wCc9gECEYfONoAAAAASUVORK5CYII=" alt="Scala Steward badge" /></a></p>
 
 <p><img src="https://raw.githubusercontent.com/vaslabs/sbt-kubeyml/master/site/src/main/resources/microsite/img/navbar_brand.png" alt="Sbt kubeyml logo" /></p>
 
@@ -8,7 +8,7 @@
 <h2 id="deployment-plugin">Deployment plugin</h2>
 
 <h3 id="add-the-plugin-to-your-pluginssbt">Add the plugin to your plugins.sbt</h3>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.4.0")
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addSbtPlugin("org.vaslabs.kube" % "sbt-kubeyml" % "0.4.1")
 </code></pre></div></div>
 
 <p>Add the plugin in your project and enable it</p>
@@ -26,98 +26,25 @@
 
 <h3 id="properties">Properties</h3>
 
-<table>
-  <thead>
-    <tr>
-      <th><strong>sbt key</strong></th>
-      <th><strong>description</strong></th>
-      <th><strong>default</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>namespace</td>
-      <td>The kubernetes namespace of the deployment</td>
-      <td>Default value is project name</td>
-    </tr>
-    <tr>
-      <td>application</td>
-      <td>The name of the deployment</td>
-      <td>Default value is project name</td>
-    </tr>
-    <tr>
-      <td>dockerImage</td>
-      <td>The docker image to deploy in a single container</td>
-      <td>Default is the picked from sbt-native-packager</td>
-    </tr>
-    <tr>
-      <td>ports</td>
-      <td>List of container ports optionally tagged with name</td>
-      <td>dockerExposedPorts from docker plugin</td>
-    </tr>
-    <tr>
-      <td>livenessProbe</td>
-      <td>Healthcheck probe</td>
-      <td><code class="language-plaintext highlighter-rouge">HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)</code></td>
-    </tr>
-    <tr>
-      <td>readinessProbe</td>
-      <td>Probe to check when deployment is ready to receive traffic</td>
-      <td>livenessProbe</td>
-    </tr>
-    <tr>
-      <td>annotations</td>
-      <td><code class="language-plaintext highlighter-rouge">Map[String, String]</code> for spec template annotations (e.g. aws roles)</td>
-      <td>empty</td>
-    </tr>
-    <tr>
-      <td>replicas</td>
-      <td>the number of replicas to be deployed</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <td>imagePullPolicy</td>
-      <td>Image pull policy for kubernetes, set to IfNotPresent or Always</td>
-      <td>IfNotPresent</td>
-    </tr>
-    <tr>
-      <td>command</td>
-      <td>Command for the container</td>
-      <td>empty</td>
-    </tr>
-    <tr>
-      <td>args</td>
-      <td>arguments for the command</td>
-      <td>empty Seq</td>
-    </tr>
-    <tr>
-      <td>envs</td>
-      <td>Map of environment variables, raw, field path or secret are supported</td>
-      <td>empty</td>
-    </tr>
-    <tr>
-      <td>resourceRequests</td>
-      <td>Resource requests (cpu in the form of m, memory in the form of MiB</td>
-      <td><code class="language-plaintext highlighter-rouge">Resource(Cpu(100), Memory(256))</code></td>
-    </tr>
-    <tr>
-      <td>resourceLimits</td>
-      <td>Resource limits (cpu in the form of m, memory in the form of MiB</td>
-      <td><code class="language-plaintext highlighter-rouge">Resource(Cpu(1000), Memory(512))</code></td>
-    </tr>
-    <tr>
-      <td>target</td>
-      <td>The directory to output the deployment.yml</td>
-      <td>target in ThisProject / kubeyml</td>
-    </tr>
-    <tr>
-      <td>deployment</td>
-      <td>The key to access the whole Deployment definition, exposed for further customisation</td>
-      <td>Instance with above defaults</td>
-    </tr>
-  </tbody>
-</table>
-
+<p><strong>sbt key</strong>  | <strong>description</strong>  | <strong>default</strong>  | 
+—|—|—|
+ namespace  | The kubernetes namespace of the deployment   |  Default value is project name | 
+  application | The name of the deployment  |  Default value is project name  |
+  dockerImage | The docker image to deploy in a single container |  Default is the picked from sbt-native-packager |
+ ports | List of container ports optionally tagged with name | dockerExposedPorts from docker plugin|
+ livenessProbe  | Healthcheck probe  | <code class="language-plaintext highlighter-rouge">HttpProbe(HttpGet("/health", 8080, List.empty), 0 seconds, 1 second, 10 seconds, 3, 1)</code> |
+ readinessProbe  |  Probe to check when deployment is ready to receive traffic  | livenessProbe  |
+ annotations  | <code class="language-plaintext highlighter-rouge">Map[String, String]</code> for spec template annotations (e.g. aws roles)  | empty  |
+ replicas | the number of replicas to be deployed| 2 |
+ imagePullPolicy | Image pull policy for kubernetes, set to IfNotPresent or Always | IfNotPresent |
+ command | Command for the container | empty |
+ args | arguments for the command | empty Seq |
+ envs | Map of environment variables, raw, field path or secret are supported| empty |
+ resourceRequests | Resource requests (cpu in the form of m, memory in the form of MiB |  <code class="language-plaintext highlighter-rouge">Resource(Cpu(100), Memory(256))</code> |
+ resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  <code class="language-plaintext highlighter-rouge">Resource(Cpu(1000), Memory(512))</code> |
+ target | The directory to output the deployment.yml | target in ThisProject / kubeyml |
+ deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
+ persistentVolumes | Persistent volumes that should be used by deployment pods | empty Seq |</p>
 <h3 id="recipes">Recipes</h3>
 
 <h4 id="single-namespace-two-types-of-deployments-with-secret-and-dependency">Single namespace, two types of deployments with secret and dependency</h4>
@@ -153,7 +80,7 @@
   <span class="pi">-</span> <span class="s">publish-image</span>
   <span class="pi">-</span> <span class="s">deploy</span>
 
-<span class="s">.publish-template</span><span class="pi">:</span>
+<span class="na">.publish-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">publish-image</span>
   <span class="na">script</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
@@ -163,7 +90,7 @@
       <span class="na">paths</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/deployment.yml</span>
 
-<span class="s">.deploy-template</span><span class="pi">:</span>
+<span class="na">.deploy-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">deploy</span>
   <span class="na">image</span><span class="pi">:</span> <span class="s">docker-image-that-has-your-kubectl-config</span>
   <span class="na">script</span><span class="pi">:</span>
@@ -203,7 +130,7 @@
 
 <p>Then your gitlab publish template will look like (example extended from above)</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.publish-template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">.publish-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">publish-image</span>
   <span class="na">script</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
@@ -215,7 +142,7 @@
         <span class="pi">-</span> <span class="s">target/kubeyml/service.yml</span>
 </code></pre></div></div>
 <p>And deploy with</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.deploy-template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">.deploy-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">deploy</span>
   <span class="na">image</span><span class="pi">:</span> <span class="s">docker-image-that-has-your-kubectl-config</span>
   <span class="na">script</span><span class="pi">:</span>
@@ -300,7 +227,7 @@ are mapped properly to the ingress configuration.</p>
 
 <p>Potentially the CI configuration evolves to</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">.publish-template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">.publish-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">publish-image</span>
   <span class="na">script</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">sbt docker:publish</span>
@@ -311,7 +238,7 @@ are mapped properly to the ingress configuration.</p>
         <span class="pi">-</span> <span class="s">target/kubeyml/deployment.yml</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/service.yml</span>
         <span class="pi">-</span> <span class="s">target/kubeyml/ingress.yml</span>
-<span class="s">.deploy-template</span><span class="pi">:</span>
+<span class="na">.deploy-template</span><span class="pi">:</span>
   <span class="na">stage</span><span class="pi">:</span> <span class="s">deploy</span>
   <span class="na">image</span><span class="pi">:</span> <span class="s">docker-image-that-has-your-kubectl-config</span>
   <span class="na">script</span><span class="pi">:</span>

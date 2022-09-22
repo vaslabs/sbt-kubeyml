@@ -66,7 +66,7 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
     forAll(lowEmptyChance) { deploymentTestParts: DeploymentTestParts =>
       import deploymentTestParts._
       whenever(nonEmptyParts(deploymentTestParts)) {
-        val deployment = deploy
+        val deployment: Deployment = deploy
           .namespace(namespace)
           .service(serviceName)
           .withImage(dockerImage)
@@ -79,6 +79,7 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
           .annotateSpecTemplate(Map(metadataKey -> metadataValue))
           .addCommand(Some("webserver"), Seq("/path/to/config"))
           .env(envName, envValue)
+          .addPersistentVolumes(Seq(VolumeWithClaim("vol-name", "claim-name", "/path")))
 
         val expectedYaml = parse(s"""
                                     |apiVersion: apps/v1
@@ -103,6 +104,10 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
                                     |      annotations:
                                     |        ${metadataKey}: "${metadataValue}"
                                     |    spec:
+                                    |      volumes:
+                                    |        - name: vol-name
+                                    |          persistentVolumeClaim:
+                                    |            claimName: claim-name
                                     |      containers:
                                     |        - image: "${dockerImage}"
                                     |          imagePullPolicy: IfNotPresent
@@ -123,6 +128,9 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
                                     |            successThreshold: 1
                                     |            failureThreshold: 3
                                     |            timeoutSeconds: 1
+                                    |          volumeMounts:
+                                    |             - mountPath: /path
+                                    |               name: vol-name
                                     |          resources:
                                     |            requests:
                                     |              memory: "256Mi"
@@ -318,22 +326,21 @@ class KubernetesStateYamlSpec extends AnyFlatSpec with Matchers with ScalaCheckP
 
   "deployment strategy json" must "comply to kubernetes schema" in {
     forAll(Gen.oneOf[DeploymentStrategy](Recreate, RollingUpdate(0, 0))) { deploymentStrategy: DeploymentStrategy =>
-        deploymentStrategy match {
-          case Recreate =>
-            Right(deploymentStrategy.asJson) shouldBe parse(
-              """
+      deploymentStrategy match {
+        case Recreate =>
+          Right(deploymentStrategy.asJson) shouldBe parse("""
                 |type: Recreate
                 |""".stripMargin)
-          case RollingUpdate(maxSurge, maxUnavailable) =>
-            Right(deploymentStrategy.asJson) shouldBe parse(
-              s"""
+        case RollingUpdate(maxSurge, maxUnavailable) =>
+          Right(deploymentStrategy.asJson) shouldBe parse(
+            s"""
                  |type: RollingUpdate
                  |rollingUpdate:
                  |  maxUnavailable: ${maxUnavailable}
                  |  maxSurge: ${maxSurge}
                  |""".stripMargin
-            )
-        }
+          )
+      }
     }
   }
 

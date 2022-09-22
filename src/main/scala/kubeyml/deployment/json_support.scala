@@ -134,8 +134,7 @@ object json_support {
   implicit val templateSpecEncoder: Encoder[TemplateSpec] = Encoder.instance(ts =>
     Json.obj(
       Seq(
-        "containers" -> ts.containers.asJson,
-        "volumes" -> ts.volumes.asJson
+        "containers" -> ts.containers.asJson
       ) ++ (addIfNonEmpty(ts.hostAliases, "hostAliases") ++ addIfNonEmpty(ts.volumes, "volumes")): _*
     )
   )

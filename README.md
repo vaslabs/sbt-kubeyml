@@ -50,7 +50,7 @@ kubeyml:gen
 | resourceLimits | Resource limits (cpu in the form of m, memory in the form of MiB |  `Resource(Cpu(1000), Memory(512))` |
 | target | The directory to output the deployment.yml | target in ThisProject / kubeyml |
 | deployment | The key to access the whole Deployment definition, exposed for further customisation | Instance with above defaults |
-
+| persistentVolumes | Persistent volumes that should be used by deployment pods | empty Seq |
 ### Recipes
 
 #### Single namespace, two types of deployments with secret and dependency

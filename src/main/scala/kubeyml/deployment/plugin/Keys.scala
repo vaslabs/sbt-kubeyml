@@ -47,6 +47,8 @@ trait Keys {
   val command = settingKey[Option[NonEmptyString]]("Command for the container")
   val args = settingKey[Seq[String]]("arguments for the container")
 
+  val persistentVolumes = settingKey[Seq[VolumeWithClaim]]("Persistent volume for the container")
+
   val imagePullPolicy = settingKey[ImagePullPolicy]("Pull policy of docker image")
   val deployment = settingKey[Deployment]("The kubernetes deployment description")
 
@@ -76,6 +78,7 @@ object Keys extends Keys {
     annotations := Map.empty,
     replicas := 2,
     envs := Map.empty,
+    persistentVolumes := Seq.empty,
     resourceRequests := Resources().requests,
     resourceLimits := Resources().limits,
     command := None,
@@ -95,6 +98,7 @@ object Keys extends Keys {
         .addCommand(kubeSetting(command).value, kubeSetting(args).value)
         .replicas(kubeSetting(replicas).value)
         .addEnv(kubeSetting(envs).value)
+        .addPersistentVolumes(kubeSetting(persistentVolumes).value)
         .resources(kubeSetting(resourceLimits).value, kubeSetting(resourceRequests).value)
         .pullPolicy(kubeSetting(imagePullPolicy).value)
   )

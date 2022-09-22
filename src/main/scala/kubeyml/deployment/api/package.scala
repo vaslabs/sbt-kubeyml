@@ -29,7 +29,7 @@ package object api {
     EmptyDeployment
 
   implicit def toNonEmptyString(value: String): NonEmptyString = {
-    require(!value.isEmpty)
+    require(value.nonEmpty)
     NonEmptyString(value)
   }
 
@@ -53,7 +53,7 @@ package object api {
   }
 
   implicit final class DockerisedAppDeploymentOps(val dockerisedAppDeployment: DockerisedAppDeployment) extends AnyVal {
-    import dockerisedAppDeployment._
+    import dockerisedAppDeployment.*
 
     def withProbes(livenessProbe: Probe, readinessProbe: Probe): Deployment = Deployment(
       metadata = DeploymentMetadata(name = dockerisedAppDeployment.service, namespace = namespace),
@@ -76,9 +76,11 @@ package object api {
                 IfNotPresent,
                 livenessProbe,
                 readinessProbe,
-                Map.empty
+                Map.empty,
+                Seq.empty
               )
             ),
+            List.empty,
             List.empty
           )
         ),
@@ -93,7 +95,7 @@ package object api {
 
     def replicas(number: Int): Deployment = deployment.copy(spec = deployment.spec.copy(replicas = number))
 
-    def annotateTemplate(annotations: Map[String, String]) = deployment.annotateSpecTemplate(annotations)
+    def annotateTemplate(annotations: Map[String, String]): Deployment = deployment.annotateSpecTemplate(annotations)
 
     def envFromSecret(variableName: String, name: String, key: String): Deployment =
       deployment.addEnv(Map(EnvName(variableName) -> EnvSecretValue(name, key)))

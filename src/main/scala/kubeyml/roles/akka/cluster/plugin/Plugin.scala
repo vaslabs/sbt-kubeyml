@@ -22,6 +22,7 @@
 package kubeyml.roles.akka.cluster.plugin
 import kubeyml.roles.json_support._
 
+
 import kubeyml.deployment.plugin.Keys.kube
 import kubeyml.deployment.plugin.KubeDeploymentPlugin
 import kubeyml.roles.{Role, RoleBinding}

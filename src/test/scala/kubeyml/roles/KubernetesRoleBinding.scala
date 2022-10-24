@@ -51,9 +51,9 @@ trait KubernetesRoleBinding {
     serviceAccount <- arbitraryNonEmptyString
     roleName <- arbitraryNonEmptyString
   } yield serviceAccount.value -> RoleBinding(
-    RoleBindingMetadata(name, namespace),
-    List(UserSubject(serviceAccount, namespace)),
-    RoleRef(Role(RoleMetadata(roleName, namespace), List.empty))
+      RoleBindingMetadata(name, namespace),
+      List(UserSubject(serviceAccount, namespace)),
+      RoleRef(Role(RoleMetadata(roleName, namespace), List.empty))
   )
 
 }

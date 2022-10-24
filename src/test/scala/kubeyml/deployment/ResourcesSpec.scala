@@ -21,6 +21,7 @@
 
 package kubeyml.deployment
 
+
 import scala.util.Random
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -29,7 +30,7 @@ class ResourcesSpec extends AnyFlatSpec with Matchers {
 
   "from cores" must "give multiples of 1000" in {
     val aCoresNumber: Short = (Random.nextInt(10) + 1).toShort
-    Cpu.fromCores(aCoresNumber) shouldBe Cpu(aCoresNumber * 1000)
+    Cpu.fromCores(aCoresNumber) shouldBe Cpu(aCoresNumber*1000)
   }
 
   "resources" can "be updated individually" in {

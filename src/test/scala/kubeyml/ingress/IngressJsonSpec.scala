@@ -29,34 +29,34 @@ import io.circe.syntax._
 import KubernetesComponents._
 import org.scalacheck.util.ConsoleReporter
 
-class IngressJsonSpec extends Properties("ingress") {
+class IngressJsonSpec extends Properties("ingress"){
 
   override def overrideParameters(p: Test.Parameters): Test.Parameters =
     Test.Parameters.default
       .withTestCallback(ConsoleReporter(2))
 
-  propertyWithSeed("validdefinitions", Some("4MkUn89okrR9LXj33b5-LOdHtvDqBd1MRNRuKmlZ90E=")) = Prop.forAll(validDefinitionsGen) {
-    valid: ValidDefinitions =>
-      {
-        val expectedJson = ingress(valid).right.get
-        val httpRules = valid.rules.map { case ruleVariable =>
+  propertyWithSeed("validdefinitions", Some("4MkUn89okrR9LXj33b5-LOdHtvDqBd1MRNRuKmlZ90E=")) = Prop.forAll(validDefinitionsGen){ valid: ValidDefinitions => {
+      val expectedJson = ingress(valid).right.get
+      val httpRules = valid.rules.map {
+        case ruleVariable =>
           val paths = ruleVariable.paths.map(p => Path(ServiceMapping(p.serviceName, p.port), p.value))
           HttpRule(Host(ruleVariable.host), paths)
-        }
-
-        val nonEmptyAnnotations: Map[NonEmptyString, String] = valid.annotations.map { case (key, value) =>
-          NonEmptyString(key) -> value
-        }
-        val ingressDef: Ingress = CustomIngress(valid.name, valid.namespace, nonEmptyAnnotations, Spec(httpRules))
-        val generatedJson = ingressDef.asJson
-        if (generatedJson != expectedJson) {
-          println(generatedJson)
-          println(expectedJson)
-        }
-
-        generatedJson == expectedJson
-
       }
+
+      val nonEmptyAnnotations: Map[NonEmptyString, String] = valid.annotations.map {
+        case (key, value) => NonEmptyString(key) -> value
+      }
+      val ingressDef: Ingress = CustomIngress(valid.name, valid.namespace, nonEmptyAnnotations, Spec(httpRules))
+      val generatedJson = ingressDef.asJson
+      if (generatedJson != expectedJson) {
+        println(generatedJson)
+        println(expectedJson)
+      }
+
+      generatedJson == expectedJson
+
+    }
   }
+
 
 }

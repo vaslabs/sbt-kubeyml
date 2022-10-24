@@ -31,32 +31,30 @@ import kubeyml.deployment.api._
 import scala.concurrent.duration._
 import scala.util.{Failure, Try}
 
-class KubernetesYamlProperties extends Properties("yaml") {
+class KubernetesYamlProperties extends Properties("yaml"){
 
-  property("yieldserror") = Prop.forAll(highEmptyChance) { deploymentParts: DeploymentTestParts =>
-    {
-      import deploymentParts._
-      Try(
-        deploy
-          .namespace(namespace)
-          .service(serviceName)
-          .withImage(dockerImage)
-          .withProbes(
-            livenessProbe = HttpProbe(
-              HttpGet("/health", 8080, List.empty),
-              initialDelay = 3 seconds,
-              period = 5 seconds
-            ),
-            readinessProbe = NoProbe
-          )
-          .replicas(1)
-          .addPorts(List(Port(Some("app"), 8080)))
-          .annotateSpecTemplate(Map(metadataKey -> metadataValue))
-          .env(envName, envValue)
-      ) match {
-        case Failure(_: IllegalArgumentException) => true
-        case _                                    => false
-      }
+
+  property("yieldserror") = Prop.forAll(highEmptyChance) {
+    deploymentParts: DeploymentTestParts => {
+        import deploymentParts._
+        Try(
+          deploy.namespace(namespace)
+            .service(serviceName)
+            .withImage(dockerImage)
+            .withProbes(
+              livenessProbe = HttpProbe(
+                HttpGet("/health", 8080, List.empty), initialDelay = 3 seconds, period = 5 seconds
+              ),
+              readinessProbe = NoProbe
+            )
+            .replicas(1)
+            .addPorts(List(Port(Some("app"), 8080)))
+            .annotateSpecTemplate(Map(metadataKey -> metadataValue))
+            .env(envName, envValue)
+        ) match {
+          case Failure(_: IllegalArgumentException) => true
+          case _ => false
+        }
     }
   }
 
@@ -78,13 +76,11 @@ class KubernetesYamlProperties extends Properties("yaml") {
       """
     )
 
-    val actualJson = Right(
-      Map[EnvName, EnvValue](
-        EnvName(fieldPathName) -> EnvFieldValue(fieldPathValue),
-        EnvName(secretEnvName) -> EnvSecretValue(secretName, secretKey),
-        EnvName(rawName) -> EnvRawValue(rawValue)
-      ).asJson
-    )
+    val actualJson = Right(Map[EnvName, EnvValue](
+      EnvName(fieldPathName) -> EnvFieldValue(fieldPathValue),
+      EnvName(secretEnvName) -> EnvSecretValue(secretName, secretKey),
+      EnvName(rawName) -> EnvRawValue(rawValue)
+    ).asJson)
 
     if (actualJson != envYaml) {
       println(actualJson.right.get)

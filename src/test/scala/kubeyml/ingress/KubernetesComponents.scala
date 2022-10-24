@@ -28,18 +28,22 @@ import org.scalacheck.Gen
 import io.circe.syntax._
 import cats.implicits._
 
+
 case class PathVariable(serviceName: String, port: Int, value: String)
 
 case class RuleVariable(host: String, paths: List[PathVariable])
 
 case class ValidDefinitions(
-  annotations: Map[String, String],
-  name: String,
-  namespace: String,
-  rules: List[RuleVariable]
+       annotations: Map[String, String],
+       name: String,
+       namespace: String,
+       rules: List[RuleVariable]
 )
 
+
+
 trait KubernetesComponents {
+
 
   private val arbitraryNonEmptyString: Gen[NonEmptyString] =
     Gen.nonEmptyListOf(Gen.alphaChar).map(_.mkString).map(NonEmptyString)
@@ -54,7 +58,8 @@ trait KubernetesComponents {
   } yield PathVariable(serviceName, servicePort, path)
 
   private val hostnameWordGen: Gen[String] =
-    Gen.nonEmptyListOf(arbitraryNonEmptyLowercaseString.map(_.value)).map(_.mkString("-"))
+      Gen.nonEmptyListOf(arbitraryNonEmptyLowercaseString.map(_.value)).map(_.mkString("-"))
+
 
   private val ruleVariableGen: Gen[RuleVariable] = for {
     host <- Gen.oneOf(
@@ -66,10 +71,11 @@ trait KubernetesComponents {
     pathVariable <- Gen.listOf(pathVariableGen)
   } yield RuleVariable(host, pathVariable)
 
-  private val annotationsGen = Gen.mapOf(for {
-    key <- arbitraryNonEmptyString
-    value <- Gen.alphaNumStr
-  } yield key.value -> value)
+  private val annotationsGen = Gen.mapOf (for {
+      key <- arbitraryNonEmptyString
+      value <- Gen.alphaNumStr
+    } yield key.value -> value
+  )
 
   val validDefinitionsGen: Gen[ValidDefinitions] = for {
     name <- arbitraryNonEmptyString.map(_.value)
@@ -77,6 +83,7 @@ trait KubernetesComponents {
     ruleVariables <- Gen.listOf(ruleVariableGen)
     annotations <- annotationsGen
   } yield ValidDefinitions(annotations, name, namespace, ruleVariables)
+
 
 }
 
@@ -109,11 +116,10 @@ object KubernetesComponents extends KubernetesComponents {
   }
 
   def ingress(
-    annotations: Map[String, String],
-    name: String,
-    namespace: String,
-    rules: List[RuleVariable]
-  ): Either[ParsingFailure, Json] = {
+               annotations: Map[String, String],
+               name: String,
+               namespace: String,
+               rules: List[RuleVariable]): Either[ParsingFailure, Json] = {
     val jsonDefinition = parse(s"""
                                   |apiVersion: networking.k8s.io/v1beta1
                                   |kind: Ingress
@@ -133,9 +139,7 @@ object KubernetesComponents extends KubernetesComponents {
   }
 
   def ingress(validDefinitions: ValidDefinitions): Either[ParsingFailure, Json] = ingress(
-    validDefinitions.annotations,
-    validDefinitions.name,
-    validDefinitions.namespace,
-    validDefinitions.rules
+    validDefinitions.annotations, validDefinitions.name,
+    validDefinitions.namespace, validDefinitions.rules
   )
 }

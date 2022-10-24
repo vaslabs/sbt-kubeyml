@@ -48,48 +48,50 @@ trait KubernetesComponents {
     } yield deploymentTestParts
 
   val lowEmptyChance: Gen[DeploymentTestParts] = for {
-    serviceName <- Gen.alphaNumStr
-    namespace <- Gen.alphaNumStr
-    metaKey <- Gen.alphaNumStr
-    metaValue <- Gen.alphaNumStr
-    dockerImage <- Gen.alphaNumStr
-    envName <- Gen.alphaNumStr
-    envValue <- Gen.alphaNumStr
-  } yield DeploymentTestParts(serviceName, namespace, metaKey, metaValue, dockerImage, envName, envValue)
+      serviceName <- Gen.alphaNumStr
+      namespace <- Gen.alphaNumStr
+      metaKey <- Gen.alphaNumStr
+      metaValue <- Gen.alphaNumStr
+      dockerImage <- Gen.alphaNumStr
+      envName <- Gen.alphaNumStr
+      envValue <- Gen.alphaNumStr
+    } yield DeploymentTestParts(serviceName, namespace, metaKey, metaValue, dockerImage, envName, envValue)
+
 
   implicit val nonEmptyStringGen: Arbitrary[NonEmptyString] =
     Arbitrary(Gen.alphaStr.filterNot(_.isEmpty).map(NonEmptyString))
 
-  val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] = {
-    for {
-      envTestParts <- implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
-      alphaNumRawValue <- Gen.alphaNumStr
-    } yield (envTestParts.copy(rawValue = alphaNumRawValue))
-  }.filterNot { case EnvironmentVariableTestParts(fieldPathName, _, secretEnvName, _, _, rawName, _) =>
-    Seq(fieldPathName == secretEnvName, fieldPathName == rawName, secretEnvName == rawName)
-      .fold(false)(_ || _)
+  val environmentVariableTestPartsGen: Gen[EnvironmentVariableTestParts] ={ for {
+    envTestParts <- implicitly[Arbitrary[EnvironmentVariableTestParts]].arbitrary
+    alphaNumRawValue <- Gen.alphaNumStr
+  } yield (envTestParts.copy(rawValue = alphaNumRawValue))
+  }.filterNot {
+    case EnvironmentVariableTestParts(fieldPathName, _, secretEnvName, _, _, rawName, _) =>
+      Seq(fieldPathName == secretEnvName, fieldPathName == rawName, secretEnvName == rawName)
+        .fold(false)(_ || _)
   }
 
 }
 
+
 object KubernetesComponents extends KubernetesComponents
 
 case class DeploymentTestParts(
-  serviceName: String,
-  namespace: String,
-  metadataKey: String,
-  metadataValue: String,
-  dockerImage: String,
-  envName: String,
-  envValue: String
+      serviceName: String,
+      namespace: String,
+      metadataKey: String,
+      metadataValue: String,
+      dockerImage: String,
+      envName: String,
+      envValue: String
 )
 
 case class EnvironmentVariableTestParts(
-  fieldPathName: NonEmptyString,
-  fieldPathValue: NonEmptyString,
-  secretEnvName: NonEmptyString,
-  secretKey: NonEmptyString,
-  secretName: NonEmptyString,
-  rawName: NonEmptyString,
-  rawValue: String
+   fieldPathName: NonEmptyString,
+   fieldPathValue: NonEmptyString,
+   secretEnvName: NonEmptyString,
+   secretKey: NonEmptyString,
+   secretName: NonEmptyString,
+   rawName: NonEmptyString,
+   rawValue: String
 )

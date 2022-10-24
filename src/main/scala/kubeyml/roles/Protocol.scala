@@ -25,6 +25,7 @@ import kubeyml.protocol.NonEmptyString
 
 case class Role(metadata: RoleMetadata, rules: List[Rule])
 
+
 case class RoleMetadata(name: NonEmptyString, namespace: NonEmptyString)
 case class Rule(apiGroups: List[ApiGroup], resources: List[Resource], verbs: List[Verb])
 
@@ -53,6 +54,9 @@ case class RoleBindingMetadata(name: NonEmptyString, namespace: NonEmptyString)
 
 sealed trait Subject
 
-case class UserSubject(serviceAccount: NonEmptyString = NonEmptyString("default"), namespace: NonEmptyString) extends Subject
+case class UserSubject(
+          serviceAccount: NonEmptyString = NonEmptyString("default"),
+          namespace: NonEmptyString) extends Subject
+
 
 case class RoleRef(role: Role)

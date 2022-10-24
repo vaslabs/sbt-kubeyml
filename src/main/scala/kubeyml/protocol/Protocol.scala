@@ -34,14 +34,10 @@ case class PortNumber(value: Int) {
 
 case class IPv4 private (value: Int) {
   val show: String =
-    InetAddress
-      .getByAddress(
-        ByteBuffer
-          .allocate(4)
-          .putInt(value)
-          .array()
-      )
-      .getHostAddress
+    InetAddress.getByAddress(
+      ByteBuffer.allocate(4)
+        .putInt(value).array()
+    ).getHostAddress
 }
 
 object IPv4 {
@@ -52,6 +48,7 @@ object IPv4 {
 
   private def apply(value: Int): IPv4 = new IPv4(value)
 }
+
 
 case class Host(value: String) {
   private val validationRegex = "[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*"

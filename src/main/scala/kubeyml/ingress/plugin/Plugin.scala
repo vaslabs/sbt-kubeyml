@@ -71,21 +71,23 @@ object Plugin {
     ingress match {
       case CustomIngress(_, _, _, Spec(rules), _) =>
         val validatedResult = rules
-          .flatMap { case HttpRule(_, paths) =>
-            paths.map { case Path(ServiceMapping(name, port), _) =>
-              val portMatching =
-                service.spec.ports
-                  .find(_.port == port)
-                  .map(_ => ingress)
-                  .toRight[List[IngressFailure]](List(PortMappingFailure(port.value)))
+          .flatMap {
+            case HttpRule(_, paths) =>
+              paths.map {
+                case Path(ServiceMapping(name, port), _) =>
+                  val portMatching =
+                    service.spec.ports
+                      .find(_.port == port)
+                      .map(_ => ingress)
+                      .toRight[List[IngressFailure]](List(PortMappingFailure(port.value)))
 
-              val nameMatching = Either.cond(
-                name == service.name,
-                ingress,
-                List(ServiceNameFailure(service.name.value, name.value))
-              )
-              portMatching |+| nameMatching
-            }
+                  val nameMatching = Either.cond(
+                    name == service.name,
+                    ingress,
+                    List(ServiceNameFailure(service.name.value, name.value))
+                  )
+                  portMatching |+| nameMatching
+              }
           }
           .fold(Right(ingress))(_ |+| _)
         validatedResult

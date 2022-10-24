@@ -28,16 +28,17 @@ import kubeyml.protocol.json_support._
 
 object json_support {
 
-  implicit val serviceTypeEncoder: Encoder[ServiceType] = Encoder.encodeString.contramap { case NodePort =>
-    "NodePort"
+  implicit val serviceTypeEncoder: Encoder[ServiceType] = Encoder.encodeString.contramap {
+    case NodePort => "NodePort"
   }
 
-  implicit val selectorEncoder: Encoder[Selector] = Encoder.instance { case AppSelector(appName) =>
-    Json.obj("app" -> appName.asJson)
+  implicit val selectorEncoder: Encoder[Selector] = Encoder.instance {
+    case AppSelector(appName) =>
+      Json.obj("app" -> appName.asJson)
   }
 
-  implicit val networkProtocolEncoder: Encoder[NetworkProtocol] = Encoder.encodeString.contramap { case TCP =>
-    "TCP"
+  implicit val networkProtocolEncoder: Encoder[NetworkProtocol] = Encoder.encodeString.contramap {
+    case TCP => "TCP"
   }
 
   implicit val targetPortEncoder: Encoder[TargetPort] = Encoder.instance {

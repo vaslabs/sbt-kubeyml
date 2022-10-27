@@ -28,22 +28,22 @@ import io.circe.syntax._
 
 class RoleBindingSpec extends Properties("RoleBinding") with KubernetesRoleBinding {
 
-  property("validrolebinding") = forAll(roleBindingGen) {
-    case (serviceAccount, roleBinding) =>
-      val expectedJson = binding(
-        roleBinding.metadata.namespace.value,
-        roleBinding.metadata.name.value,
-        serviceAccount,
-        roleBinding.roleRef.role.metadata.name.value)
+  property("validrolebinding") = forAll(roleBindingGen) { case (serviceAccount, roleBinding) =>
+    val expectedJson = binding(
+      roleBinding.metadata.namespace.value,
+      roleBinding.metadata.name.value,
+      serviceAccount,
+      roleBinding.roleRef.role.metadata.name.value
+    )
 
-      val actualJson = Right(roleBinding.asJson)
+    val actualJson = Right(roleBinding.asJson)
 
-      if (expectedJson != actualJson) {
-        println(expectedJson)
-        println(actualJson)
-      }
+    if (expectedJson != actualJson) {
+      println(expectedJson)
+      println(actualJson)
+    }
 
-      expectedJson == actualJson
+    expectedJson == actualJson
   }
 
 }

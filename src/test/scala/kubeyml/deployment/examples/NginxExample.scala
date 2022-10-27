@@ -34,17 +34,17 @@ import kubeyml.protocol.Host
 
 object NginxExample extends App {
 
-  val deployment = deploy.namespace("yournamespace")
+  val deployment = deploy
+    .namespace("yournamespace")
     .service("nginx-deployment")
     .withImage("nginx:1.7.9")
     .withProbes(
       livenessProbe = HttpProbe(HttpGet("/", port = 80, httpHeaders = List.empty), period = 10 seconds),
       readinessProbe = HttpProbe(HttpGet("/", port = 80, httpHeaders = List.empty), failureThreshold = 10)
-    ).replicas(3)
+    )
+    .replicas(3)
     .pullDockerImage(IfNotPresent)
-    .addPorts(List(Port(None, 80))
-  )
-
+    .addPorts(List(Port(None, 80)))
 
   val service = Service.fromDeployment(deployment)
 
@@ -53,12 +53,10 @@ object NginxExample extends App {
     "yournamespace",
     Map(Annotate.nginxRewriteTarget("/"), Annotate.nginxIngress()),
     IngressSpec(
-      List(HttpRule(Host("your-host.domain.smth"),
-      List(IngressPath(ServiceMapping("nginx-deployment", 80), "/testpath"))))
+      List(HttpRule(Host("your-host.domain.smth"), List(IngressPath(ServiceMapping("nginx-deployment", 80), "/testpath"))))
     )
   )
 
   println(ingress.asJson.asYaml.spaces4)
-
 
 }

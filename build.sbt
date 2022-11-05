@@ -3,9 +3,9 @@ import xerial.sbt.Sonatype.GitHubHosting
 
 name := "sbt-kubeyml"
 
-scalaVersion := "2.12.16"
+scalaVersion := "2.12.17"
 
-lazy val scala212 = "2.12.16"
+lazy val scala212 = "2.12.17"
 
 lazy val `kubeyml` = (project in file("."))
   .enablePlugins(AutomateHeaderPlugin, SbtPlugin)
@@ -26,16 +26,16 @@ lazy val site = (project in file("site"))
 
 crossScalaVersions := Seq(scala212)
 
-val circeVersion = "0.14.2"
+val circeVersion = "0.14.3"
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
 
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core" % circeVersion,
   "io.circe" %% "circe-generic" % circeVersion,
   "io.circe" %% "circe-yaml" % "0.14.1",
-  "org.scalatest" %% "scalatest" % "3.2.13" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.14" % Test,
   "org.scalatestplus" %% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.17.0" % Test,
   "com.github.alexarchambault" %% "scalacheck-shapeless_1.15" % "1.3.0" % Test
 )
 addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.9")

@@ -47,11 +47,13 @@ object Keys extends Keys {
     kube / livenessProbe := HttpProbe(HttpGet("/alive", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
     kube / readinessProbe := HttpProbe(HttpGet("/ready", 8558, List.empty), 10 seconds, 3 seconds, 5 seconds),
     (envs) ++=
-      Map(List(
+      Map(
+        List(
           (kube / discoveryMethodEnv).value.map(_ -> EnvRawValue("kubernetes-api")),
           (kube / hostnameEnv).value.map(_ -> EnvFieldValue("status.podIP")),
           (kube / namespaceEnv).value.map(_ -> EnvFieldValue("metadata.namespace"))
-        ).flatten: _*) ++ Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") -> EnvFieldValue("metadata.labels['app']")),
+        ).flatten: _*
+      ) ++ Map(EnvName("AKKA_CLUSTER_BOOTSTRAP_SERVICE_NAME") -> EnvFieldValue("metadata.labels['app']")),
     gen := {
       (kube / gen).value
       val namespace = (kube / DeploymentKeys.namespace).value

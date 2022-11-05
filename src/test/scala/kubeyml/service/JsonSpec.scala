@@ -30,39 +30,36 @@ import kubeyml.service.json_support._
 
 class JsonSpec extends Properties("service") {
 
-
-  property("validdefinition") = Prop.forAll(JsonSpec.arbitraryServiceVariablesNoEmpty){
-    serviceVariables =>
-      val generated = Service(serviceVariables.name, serviceVariables.namespace, Spec(
+  property("validdefinition") = Prop.forAll(JsonSpec.arbitraryServiceVariablesNoEmpty) { serviceVariables =>
+    val generated = Service(
+      serviceVariables.name,
+      serviceVariables.namespace,
+      Spec(
         serviceVariables.`type`,
         AppSelector(serviceVariables.appSelector),
-        serviceVariables.ports.map {portVar =>
-          Port(
-            portVar.name,
-            portVar.protocol,
-            PortNumber(portVar.port),
-            NumberedTargetPort(PortNumber(portVar.targetPort)))
+        serviceVariables.ports.map { portVar =>
+          Port(portVar.name, portVar.protocol, PortNumber(portVar.port), NumberedTargetPort(PortNumber(portVar.targetPort)))
         }
-      )).asJson
-      val expected = JsonSpec.generateYaml(serviceVariables)
+      )
+    ).asJson
+    val expected = JsonSpec.generateYaml(serviceVariables)
 
-      if (generated != expected) {
-        println(generated)
-        println(expected)
-      }
-      generated == expected
+    if (generated != expected) {
+      println(generated)
+      println(expected)
+    }
+    generated == expected
   }
 
 }
 
-
 object JsonSpec {
 
   case class PortVariable(
-      name: NonEmptyString,
-      protocol: NetworkProtocol,
-      port: Int,
-      targetPort: Int
+    name: NonEmptyString,
+    protocol: NetworkProtocol,
+    port: Int,
+    targetPort: Int
   )
 
   case class ServiceVariables(
@@ -93,7 +90,6 @@ object JsonSpec {
     ports <- Gen.listOf(arbitraryPortVariable.arbitrary)
   } yield ServiceVariables(name, namespace, serviceType, appSelector, ports)
 
-
   def canonicalJson(networkProtocol: NetworkProtocol): Json = networkProtocol match {
     case TCP => Json.fromString("TCP")
   }
@@ -121,7 +117,6 @@ object JsonSpec {
         |""".stripMargin
     val json = parse(ymlString).right.get
 
-
     val portsJson = Json.obj(
       "spec" -> Json.obj("ports" -> serviceVariables.ports.map(canonicalJson).asJson)
     )
@@ -129,6 +124,5 @@ object JsonSpec {
     json.deepMerge(portsJson)
 
   }
-
 
 }

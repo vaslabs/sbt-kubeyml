@@ -50,7 +50,6 @@ trait KubernetesRole {
     rules <- ruleDefinition
   } yield ValidDefinition(MetadataDefinition(name.value, namespace.value), rules)
 
-
   def roleToJson(validDefinition: ValidDefinition): Json = parse(
     """
       |kind: Role
@@ -58,20 +57,19 @@ trait KubernetesRole {
       |""".stripMargin
   ).right.get deepMerge validDefinition.asJson
 
-
   def toRole(validDefinition: ValidDefinition): Role = {
     val rules = for {
       rule <- validDefinition.rules
-      apiGroups = rule.apiGroups.map {
-        case "" => Core
+      apiGroups = rule.apiGroups.map { case "" =>
+        Core
       }.toList
-      resources = rule.resources.map {
-        case "pods" => Pods
+      resources = rule.resources.map { case "pods" =>
+        Pods
       }.toList
       verbs = rule.verbs.map {
         case "watch" => Verb.Watch
-        case "list" => Verb.List
-        case "get" => Verb.Get
+        case "list"  => Verb.List
+        case "get"   => Verb.Get
       }.toList
     } yield Rule(apiGroups, resources, verbs)
     Role(

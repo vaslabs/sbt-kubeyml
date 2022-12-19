@@ -115,7 +115,7 @@ object KubernetesComponents extends KubernetesComponents {
     rules: List[RuleVariable]
   ): Either[ParsingFailure, Json] = {
     val jsonDefinition = parse(s"""
-                                  |apiVersion: networking.k8s.io/v1beta1
+                                  |apiVersion: networking.k8s.io/v1
                                   |kind: Ingress
                                   |metadata:
                                   |  name: "${name}"

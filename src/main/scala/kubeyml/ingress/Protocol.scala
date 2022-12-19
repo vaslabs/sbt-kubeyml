@@ -30,7 +30,7 @@ case class CustomIngress(
   namespace: NonEmptyString,
   annotations: Map[NonEmptyString, String],
   spec: Spec,
-  apiVersion: ApiVersion = NetworkingV1Beta1
+  apiVersion: ApiVersion = NetworkingV1
 ) extends Ingress {
 
   /** @deprecated
@@ -39,7 +39,7 @@ case class CustomIngress(
     *   this custom ingress with apiVersion set to extensions/v1beta1
     */
   def legacy: CustomIngress =
-    this.copy(apiVersion = ExtensionsV1Beta1)
+    this.copy(apiVersion = NetworkingV1Beta1)
 }
 
 sealed trait ApiVersion {
@@ -47,13 +47,15 @@ sealed trait ApiVersion {
 }
 
 /** @deprecated
-  *   From kubernetes version 1.16 the legacy [ExtensionsV1Beta1] is depracated, use NetworkingV1Beta1
+  *   From kubernetes version 1.16 the legacy [NetworkingV1Beta1] is depracated, use NetworkingV1
   */
-case object ExtensionsV1Beta1 extends ApiVersion {
-  val show = "extentions/v1beta1"
-}
+
 case object NetworkingV1Beta1 extends ApiVersion {
   val show = "networking.k8s.io/v1beta1"
+}
+
+case object NetworkingV1 extends ApiVersion {
+  val show = "networking.k8s.io/v1"
 }
 
 case class Spec(rules: List[Rule])
